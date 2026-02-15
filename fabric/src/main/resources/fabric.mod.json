@@ -15,6 +15,9 @@
     "icon": "${mod_id}.png",
     "environment": "*",
     "entrypoints": {
+        "preLaunch": [
+            "lommie.only_craft_once.PreLaunch"
+        ],
         "main": [
             "lommie.only_craft_once.Only_craft_once"
         ]
