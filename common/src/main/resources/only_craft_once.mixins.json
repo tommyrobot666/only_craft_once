@@ -13,5 +13,6 @@
   "server": [],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "plugin": "lommie.only_craft_once.notmixin.RecipeForceMixinApplyPlugin"
 }
