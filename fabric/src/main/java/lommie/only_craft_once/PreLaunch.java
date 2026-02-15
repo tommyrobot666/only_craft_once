@@ -10,7 +10,7 @@ public class PreLaunch implements PreLaunchEntrypoint {
             ClassLoader classLoader = FabricLauncherBase.getLauncher().getTargetClassLoader();
             Class<?> knotLoader = Class.forName("net.fabricmc.loader.impl.launch.knot.KnotClassLoader", false, classLoader);
             if (knotLoader.isInstance(classLoader)){
-                System.out.println("found KnotClassLoader");
+                Constants.LOG.info("found KnotClassLoader");
             }
 
         } catch (ClassNotFoundException e) {

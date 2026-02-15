@@ -1,5 +1,6 @@
 package lommie.only_craft_once.notmixin;
 
+import lommie.only_craft_once.Constants;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
@@ -31,7 +32,9 @@ public class RecipeForceMixinApplyPlugin implements IMixinConfigPlugin {
 
     @Override
     public List<String> getMixins() {
-        return getRecipeExtenders().map((c) -> "lommie.only_craft_once.mixin.RecipeMixin$"+c.getName()).toList();
+        List<String> mixins = getRecipeExtenders().map((c) -> "lommie.only_craft_once.mixin.RecipeMixin$"+c.getName()).toList();
+        Constants.LOG.error(mixins.toString());
+        return mixins;
     }
 
     private static Stream<? extends Class<?>> getRecipeExtenders() {
@@ -55,13 +58,19 @@ public class RecipeForceMixinApplyPlugin implements IMixinConfigPlugin {
             }
         }
         final Class<?> finalRecipeClass = recipeClass;
-        return classLoader.resources("").filter(u -> u.getFile().endsWith("Recipe.class")).map((u) -> {
+//        classLoader.getResourceAsStream("")
+
+        return classLoader.resources("").filter(u -> {
+            Constants.LOG.error(u.getFile());
+            Constants.LOG.error(u.toString());
+            return u.getFile().endsWith("Recipe.class");
+        }).map((u) -> {
             try {
                 return classLoader.loadClass(u.getFile());
             } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
-        }).filter(c -> c.isInstance(finalRecipeClass));
+        });//.filter(c -> c.isInstance(finalRecipeClass));
     }
 
     @Override
