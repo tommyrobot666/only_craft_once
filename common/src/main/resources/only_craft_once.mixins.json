@@ -4,7 +4,9 @@
   "package": "lommie.only_craft_once.mixin",
   "refmap": "${mod_id}.refmap.json",
   "compatibilityLevel": "JAVA_18",
-  "mixins": [],
+  "mixins": [
+    "RecipeMixin"
+  ],
   "client": [
     "MixinMinecraft"
   ],
