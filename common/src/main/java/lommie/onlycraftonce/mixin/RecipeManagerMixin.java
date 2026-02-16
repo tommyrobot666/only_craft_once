@@ -20,8 +20,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.Optional;
 
 @Mixin(RecipeManager.class)
-public class RecipeManagerMixin {
+public abstract class RecipeManagerMixin {
     @Shadow private RecipeMap recipes;
+
+    @Shadow @Nullable protected abstract <T extends Recipe<?>> RecipeHolder<T> byKeyTyped(RecipeType<T> type, ResourceKey<Recipe<?>> key);
 
     @Inject(
             method = "getRecipeFor(Lnet/minecraft/world/item/crafting/RecipeType;Lnet/minecraft/world/item/crafting/RecipeInput;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/crafting/RecipeHolder;)Ljava/util/Optional;",
@@ -53,8 +55,12 @@ public class RecipeManagerMixin {
             cancellable = true)
     <I extends RecipeInput, T extends Recipe<@NotNull I>>
     void checkIfCraftedBefore2(RecipeType<T> recipeType, I input, Level level, @Nullable ResourceKey<Recipe<?>> recipe, CallbackInfoReturnable<Optional<RecipeHolder<T>>> cir){
-//        checkIfCraftedBefore(recipeType,input,level,recipe==null?null:new RecipeHolder<>(recipe, (T) level.registryAccess().getOrThrow(recipe).value()),cir);
-        checkIfCraftedBefore2(recipeType,input,level,cir);
+        if (recipe == null){
+            return;
+        }
+
+        RecipeHolder<T> holder = this.byKeyTyped(recipeType,recipe);
+        checkIfCraftedBefore(recipeType,input,level,holder,cir);
     }
 
     @Inject(
