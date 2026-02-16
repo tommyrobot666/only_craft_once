@@ -23,12 +23,10 @@ public abstract class ServerPlayerMixin {
                 BuiltInRegistries.STAT_TYPE.get(
                         Identifier.withDefaultNamespace("crafted")).orElseThrow().value()
         )){
-            Constants.LOG.error(stat.toString());
             TimesCraftedSavedData savedData = this.level().getDataStorage().computeIfAbsent(TimesCraftedSavedData.TYPE);
             String id = stat.getName();
             savedData.map.put(id,savedData.map.getOrDefault(id,0)+amount);
             savedData.setDirty();
-            Constants.LOG.error(savedData.map.toString());
         }
     }
 }
