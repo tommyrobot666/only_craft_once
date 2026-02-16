@@ -35,11 +35,7 @@ public abstract class RecipeManagerMixin {
         ItemStack result = lastRecipe.value().assemble(input,level.registryAccess());
         TimesCraftedSavedData savedData = ((ServerLevel) level).getDataStorage().computeIfAbsent(TimesCraftedSavedData.TYPE);
         for (Item item : CommonClass.maxTimesCrafted.keySet()) {
-            Constants.LOG.error(item.toString());
             if (result.is(item)){
-                Constants.LOG.error(String.valueOf(result.getCount() + savedData.map.getOrDefault("minecraft.crafted:"+item.toString().replace(':','.'),0)));
-                Constants.LOG.error(String.valueOf(result.getCount() + savedData.map.getOrDefault("minecraft.crafted:"+item.toString().replace(':','.'),0) > CommonClass.maxTimesCrafted.get(item)));
-                Constants.LOG.error(String.valueOf(savedData.map.getOrDefault("minecraft.crafted:"+item.toString().replace(':','.'),0)));
                 if (result.getCount() + savedData.map.getOrDefault("minecraft.crafted:"+item.toString().replace(':','.'),0) > CommonClass.maxTimesCrafted.get(item)){
                     cir.setReturnValue(Optional.empty());
                     cir.cancel();
@@ -73,6 +69,7 @@ public abstract class RecipeManagerMixin {
         if (recipeOpt.isEmpty()){
             cir.setReturnValue(Optional.empty());
             cir.cancel();
+            return;
         }
 
         checkIfCraftedBefore(recipeType,input,level,recipeOpt.orElseThrow(),cir);
