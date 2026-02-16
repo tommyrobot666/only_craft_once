@@ -33,7 +33,8 @@ public class PreLaunch implements PreLaunchEntrypoint {
         try (ScanResult scan = classGraph.scan(5)) {
             for (ClassInfo classInfo : scan.getClassesImplementing(Recipe.class)) {
                 Constants.LOG.error(classInfo.toString());
-                ClassTinkerers.addTransformation(classGraph.getClasspath(), RecipeTransformation::transformClass);
+                Constants.LOG.error(classInfo.getName().replace(".","/"));
+                ClassTinkerers.addTransformation(classInfo.getName().replace(".","/"), RecipeTransformation::transformClass);
             }
         }
     }

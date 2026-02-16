@@ -61,8 +61,8 @@ public class RecipeForceMixinApplyPlugin implements IMixinConfigPlugin {
 //        classLoader.getResourceAsStream("")
 
         return classLoader.resources("").filter(u -> {
-            Constants.LOG.error(u.getFile());
-            Constants.LOG.error(u.toString());
+//            Constants.LOG.error(u.getFile());
+//            Constants.LOG.error(u.toString());
             return u.getFile().endsWith("Recipe.class");
         }).map((u) -> {
             try {
