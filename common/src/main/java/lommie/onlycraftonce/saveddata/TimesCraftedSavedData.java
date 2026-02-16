@@ -3,6 +3,7 @@ package lommie.onlycraftonce.saveddata;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lommie.onlycraftonce.Constants;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
 import org.jetbrains.annotations.NotNull;
@@ -39,4 +40,8 @@ public class TimesCraftedSavedData extends SavedData {
     }
 
     TimesCraftedSavedData(){}
+
+    public static TimesCraftedSavedData get(ServerLevel level){
+        return level.getServer().overworld().getDataStorage().computeIfAbsent(TYPE);
+    }
 }

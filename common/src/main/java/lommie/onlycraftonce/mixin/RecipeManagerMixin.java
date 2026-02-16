@@ -1,7 +1,6 @@
 package lommie.onlycraftonce.mixin;
 
 import lommie.onlycraftonce.CommonClass;
-import lommie.onlycraftonce.Constants;
 import lommie.onlycraftonce.saveddata.TimesCraftedSavedData;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
@@ -33,7 +32,7 @@ public abstract class RecipeManagerMixin {
     void checkIfCraftedBefore(RecipeType<@NotNull T> recipeType, I input, Level level, @Nullable RecipeHolder<@NotNull T> lastRecipe, CallbackInfoReturnable<Optional<RecipeHolder<@NotNull T>>> cir){
         if (lastRecipe == null || level.isClientSide()) return;
         ItemStack result = lastRecipe.value().assemble(input,level.registryAccess());
-        TimesCraftedSavedData savedData = ((ServerLevel) level).getDataStorage().computeIfAbsent(TimesCraftedSavedData.TYPE);
+        TimesCraftedSavedData savedData = TimesCraftedSavedData.get(((ServerLevel) level));
         for (Item item : CommonClass.maxTimesCrafted.keySet()) {
             if (result.is(item)){
                 if (result.getCount() + savedData.map.getOrDefault("minecraft.crafted:"+item.toString().replace(':','.'),0) > CommonClass.maxTimesCrafted.get(item)){
@@ -51,11 +50,7 @@ public abstract class RecipeManagerMixin {
             cancellable = true)
     <I extends RecipeInput, T extends Recipe<@NotNull I>>
     void checkIfCraftedBefore2(RecipeType<T> recipeType, I input, Level level, @Nullable ResourceKey<Recipe<?>> recipe, CallbackInfoReturnable<Optional<RecipeHolder<T>>> cir){
-        if (recipe == null){
-            return;
-        }
-
-        RecipeHolder<T> holder = this.byKeyTyped(recipeType,recipe);
+        RecipeHolder<T> holder = recipe!=null?this.byKeyTyped(recipeType,recipe):null;
         checkIfCraftedBefore(recipeType,input,level,holder,cir);
     }
 

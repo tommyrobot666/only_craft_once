@@ -23,7 +23,7 @@ public abstract class ServerPlayerMixin {
                 BuiltInRegistries.STAT_TYPE.get(
                         Identifier.withDefaultNamespace("crafted")).orElseThrow().value()
         )){
-            TimesCraftedSavedData savedData = this.level().getDataStorage().computeIfAbsent(TimesCraftedSavedData.TYPE);
+            TimesCraftedSavedData savedData = TimesCraftedSavedData.get(this.level());
             String id = stat.getName();
             savedData.map.put(id,savedData.map.getOrDefault(id,0)+amount);
             savedData.setDirty();
