@@ -16,7 +16,7 @@
     "environment": "*",
     "entrypoints": {
         "main": [
-            "lommie.only_craft_once.OnlyCraftOnce"
+            "lommie.onlycraftonce.OnlyCraftOnce"
         ]
     },
     "mixins": [

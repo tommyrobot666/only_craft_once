@@ -13,20 +13,13 @@ import java.util.Optional;
 
 @Mixin(RecipeManager.class)
 public class RecipeManagerMixin {
-//    @Inject(
-//            method = "*",
-//            at = @At(
-//                    value = "INVOKE",
-//                    target = "Lnet/minecraft/world/item/crafting/Recipe;matches(Lnet/minecraft/world/item/crafting/RecipeInput;Lnet/minecraft/world/level/Level;)Z"
-//                )
-//    )
     @Inject(
             method = "getRecipeFor(Lnet/minecraft/world/item/crafting/RecipeType;Lnet/minecraft/world/item/crafting/RecipeInput;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/crafting/RecipeHolder;)Ljava/util/Optional;",
             at = @At("HEAD"),
             cancellable = true)
     <I extends RecipeInput, T extends Recipe<@NotNull I>>
     void checkIfCraftedBefore(RecipeType<@NotNull T> recipeType, I input, Level level, @Nullable RecipeHolder<@NotNull T> lastRecipe, CallbackInfoReturnable<Optional<RecipeHolder<@NotNull T>>> cir){
-        cir.setReturnValue(Optional.empty());
-        cir.cancel();
+//        cir.setReturnValue(Optional.empty());
+//        cir.cancel();
     }
 }
