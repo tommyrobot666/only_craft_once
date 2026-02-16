@@ -1,5 +1,10 @@
 package lommie.onlycraftonce.mixin;
 
+import lommie.onlycraftonce.CommonClass;
+import lommie.onlycraftonce.saveddata.TimesCraftedSavedData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +24,17 @@ public class RecipeManagerMixin {
             cancellable = true)
     <I extends RecipeInput, T extends Recipe<@NotNull I>>
     void checkIfCraftedBefore(RecipeType<@NotNull T> recipeType, I input, Level level, @Nullable RecipeHolder<@NotNull T> lastRecipe, CallbackInfoReturnable<Optional<RecipeHolder<@NotNull T>>> cir){
-//        cir.setReturnValue(Optional.empty());
-//        cir.cancel();
+        if (lastRecipe == null || level.isClientSide()) return;
+        ItemStack result = lastRecipe.value().assemble(input,level.registryAccess());
+        TimesCraftedSavedData savedData = ((ServerLevel) level).getDataStorage().computeIfAbsent(TimesCraftedSavedData.TYPE);
+        for (Item item : CommonClass.maxTimesCrafted.keySet()) {
+            if (result.is(item)){
+                if (result.getCount() + savedData.map.getOrDefault("minecraft.crafted:"+item.toString().replace(':','.'),0) > CommonClass.maxTimesCrafted.get(item)){
+                    cir.setReturnValue(Optional.empty());
+                    cir.cancel();
+                    return;
+                }
+            }
+        }
     }
 }

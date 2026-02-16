@@ -25,8 +25,8 @@ public abstract class ServerPlayerMixin {
         )){
             Constants.LOG.error(stat.toString());
             TimesCraftedSavedData savedData = this.level().getDataStorage().computeIfAbsent(TimesCraftedSavedData.TYPE);
-            Identifier id = Identifier.withDefaultNamespace(stat.getName());
-            savedData.map.put(id,savedData.map.get(id)+amount);
+            String id = stat.getName();
+            savedData.map.put(id,savedData.map.getOrDefault(id,0)+amount);
             savedData.setDirty();
             Constants.LOG.error(savedData.map.toString());
         }
