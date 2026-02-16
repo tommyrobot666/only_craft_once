@@ -1,8 +1,8 @@
-package lommie.only_craft_once;
+package lommie.onlycraftonce;
 
 import net.fabricmc.api.ModInitializer;
 
-public class Only_craft_once implements ModInitializer {
+public class OnlyCraftOnce implements ModInitializer {
 
     @Override
     public void onInitialize() {

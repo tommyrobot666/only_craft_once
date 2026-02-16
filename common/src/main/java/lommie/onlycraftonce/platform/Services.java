@@ -1,7 +1,7 @@
-package lommie.only_craft_once.platform;
+package lommie.onlycraftonce.platform;
 
-import lommie.only_craft_once.Constants;
-import lommie.only_craft_once.platform.services.IPlatformHelper;
+import lommie.onlycraftonce.Constants;
+import lommie.onlycraftonce.platform.services.IPlatformHelper;
 
 import java.util.ServiceLoader;
 

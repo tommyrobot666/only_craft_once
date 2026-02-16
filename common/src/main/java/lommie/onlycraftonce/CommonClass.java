@@ -1,6 +1,6 @@
-package lommie.only_craft_once;
+package lommie.onlycraftonce;
 
-import lommie.only_craft_once.platform.Services;
+import lommie.onlycraftonce.platform.Services;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Items;
 

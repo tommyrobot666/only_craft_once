@@ -1,4 +1,4 @@
-package lommie.only_craft_once.platform.services;
+package lommie.onlycraftonce.platform.services;
 
 public interface IPlatformHelper {
 

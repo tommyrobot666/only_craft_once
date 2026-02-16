@@ -1,4 +1,4 @@
-package lommie.only_craft_once.mixin;
+package lommie.onlycraftonce.mixin;
 
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;

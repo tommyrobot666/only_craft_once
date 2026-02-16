@@ -1,6 +1,6 @@
-package lommie.only_craft_once.platform;
+package lommie.onlycraftonce.platform;
 
-import lommie.only_craft_once.platform.services.IPlatformHelper;
+import lommie.onlycraftonce.platform.services.IPlatformHelper;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLLoader;
 
