@@ -4,7 +4,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import lommie.onlycraftonce.platform.Services;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 
@@ -64,7 +64,7 @@ public class CommonClass {
 
         maxTimesCrafted.clear();
         loadingConfig.forEach((sId,max) -> {
-            maxTimesCrafted.put(BuiltInRegistries.ITEM.get(Identifier.parse(sId)).orElseThrow().value(),max);
+            maxTimesCrafted.put(BuiltInRegistries.ITEM.get(ResourceLocation.parse(sId)),max);
                 });
     }
 }
