@@ -14,10 +14,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CommonClass {
-    public static Map<Item,Integer> maxTimesCrafted = Map.of(
+    public static HashMap<Item,Integer> maxTimesCrafted = new HashMap<>(Map.of(
             Items.MACE, 3,
             Items.IRON_NUGGET, 18
-    );
+    ));
 
     public static void init() {
         if (Services.PLATFORM.isModLoaded("only_craft_once")) {
@@ -27,6 +27,7 @@ public class CommonClass {
         try {
             loadConfig();
         } catch (IOException e) {
+            Constants.LOG.error("Error while loading config:"+e.getMessage());
             try (JsonWriter writer = new JsonWriter(Files.newBufferedWriter(Services.PLATFORM.configFile()))) {
                 writer.beginArray();
                 writer.beginObject();
@@ -38,6 +39,7 @@ public class CommonClass {
                 writer.endArray();
                 writer.close();
             } catch (IOException ex) {
+                Constants.LOG.error("Error while writing config");
                 throw new RuntimeException(ex);
             }
         }
@@ -49,15 +51,15 @@ public class CommonClass {
             reader.beginArray();
             while (reader.hasNext()){
                 reader.beginObject();
+                reader.nextName();
                 String id = reader.nextString();
+                reader.nextName();
                 int max = reader.nextInt();
                 loadingConfig.put(id,max);
                 reader.endObject();
             }
             reader.endArray();
             reader.close();
-        } catch (IOException e) {
-            throw e;
         }
 
         maxTimesCrafted.clear();
