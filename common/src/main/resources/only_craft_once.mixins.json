@@ -5,15 +5,11 @@
   "refmap": "${mod_id}.refmap.json",
   "compatibilityLevel": "JAVA_18",
   "mixins": [
-    "RecipeManagerMixin",
-    "RecipeMixin"
+    "RecipeManagerMixin"
   ],
-  "client": [
-    "MixinMinecraft"
-  ],
+  "client": [],
   "server": [],
   "injectors": {
     "defaultRequire": 1
-  },
-  "plugin": "lommie.only_craft_once.notmixin.RecipeForceMixinApplyPlugin"
+  }
 }

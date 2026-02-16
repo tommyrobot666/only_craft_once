@@ -10,10 +10,6 @@ dependencies {
     }
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
-//    implementation "com.github.Chocohead:Fabric-ASM:v2.3"
-    modImplementation(files("src/lib/Manningham.Mills-2.0.jar"))
-    // Source: https://mvnrepository.com/artifact/io.github.classgraph/classgraph
-    implementation("io.github.classgraph:classgraph:4.8.184")
 }
 
 loom {

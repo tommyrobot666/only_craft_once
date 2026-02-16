@@ -2,17 +2,6 @@ pluginManagement {
     repositories {
         gradlePluginPortal()
         mavenCentral()
-//        exclusiveContent {
-//            forRepository {
-//                maven {
-//                    name = "JitPack"
-//                    url "https://jitpack.io"
-//                }
-//            }
-//            filter {
-//                includeGroup("com.github.Chocohead")
-//            }
-//        }
         exclusiveContent {
             forRepository {
                 maven {
