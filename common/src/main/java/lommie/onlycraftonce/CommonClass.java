@@ -15,7 +15,7 @@ import java.util.Map;
 
 public class CommonClass {
     public static HashMap<Item,Integer> maxTimesCrafted = new HashMap<>(Map.of(
-            Items.MACE, 3,
+            Items.MACE, 2,
             Items.IRON_NUGGET, 18
     ));
 
