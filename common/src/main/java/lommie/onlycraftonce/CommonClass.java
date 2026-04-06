@@ -3,6 +3,7 @@ package lommie.onlycraftonce;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import lommie.onlycraftonce.platform.Services;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
@@ -64,7 +65,12 @@ public class CommonClass {
 
         maxTimesCrafted.clear();
         loadingConfig.forEach((sId,max) -> {
-            maxTimesCrafted.put(BuiltInRegistries.ITEM.get(Identifier.parse(sId)).orElseThrow().value(),max);
-                });
+            maxTimesCrafted.put(BuiltInRegistries.ITEM.getOptional(Identifier.parse(sId)).orElse(Items.AIR),max);
+        });
+
+        if (maxTimesCrafted.containsKey(Items.AIR)){
+            Constants.LOG.error("Config loading error: An item id either failed to parse or wasn't found");
+        }
+        maxTimesCrafted.remove(Items.AIR);
     }
 }
