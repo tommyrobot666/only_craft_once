@@ -28,7 +28,7 @@ public abstract class RecipeManagerMixin {
     void checkIfCraftedBefore(RecipeType<T> recipeType, I input, Level level, CallbackInfoReturnable<Optional<RecipeHolder<T>>> cir){
         if (cir.getReturnValue().isEmpty()) return;
         var recipeHolder = cir.getReturnValue().get();
-        ItemStack result = recipeHolder.value().assemble(input,level.registryAccess());
+        ItemStack result = recipeHolder.value().assemble(input);
         Item item = result.getItem();
         TimesCraftedSavedData savedData = TimesCraftedSavedData.get(((ServerLevel) level));
         String key = "minecraft.crafted:"+item.toString().replace(':','.');

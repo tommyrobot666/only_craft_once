@@ -3,6 +3,7 @@ package lommie.onlycraftonce.saveddata;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lommie.onlycraftonce.Constants;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
@@ -26,7 +27,7 @@ public class TimesCraftedSavedData extends SavedData {
     }
 
     public static SavedDataType<@NotNull TimesCraftedSavedData> TYPE = new SavedDataType<>(
-            Constants.MOD_ID+"_times_crafted",
+            Identifier.fromNamespaceAndPath(Constants.MOD_ID,"_times_crafted"),
             TimesCraftedSavedData::new,
             CODEC,
             null
