@@ -1,12 +1,10 @@
 package lommie.onlycraftonce.mixin;
 
-import lommie.onlycraftonce.Constants;
 import lommie.onlycraftonce.saveddata.TimesCraftedSavedData;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stat;
+import net.minecraft.stats.Stats;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -19,10 +17,7 @@ public abstract class ServerPlayerMixin {
 
     @Inject(method = "awardStat", at = @At("HEAD"))
     void addTimesCrafted(Stat<?> stat, int amount, CallbackInfo ci){
-        if (stat.getType().equals(
-                BuiltInRegistries.STAT_TYPE.get(
-                        Identifier.withDefaultNamespace("crafted")).orElseThrow().value()
-        )){
+        if (stat.getType().equals(Stats.ITEM_CRAFTED)){
             TimesCraftedSavedData savedData = TimesCraftedSavedData.get(this.level());
             String id = stat.getName();
             savedData.map.put(id,savedData.map.getOrDefault(id,0)+amount);
