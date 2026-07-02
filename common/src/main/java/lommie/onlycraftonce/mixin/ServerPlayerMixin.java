@@ -1,5 +1,6 @@
 package lommie.onlycraftonce.mixin;
 
+import lommie.onlycraftonce.Constants;
 import lommie.onlycraftonce.saveddata.TimesCraftedSavedData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -20,6 +21,9 @@ public abstract class ServerPlayerMixin {
         if (stat.getType().equals(Stats.ITEM_CRAFTED)){
             TimesCraftedSavedData savedData = TimesCraftedSavedData.get(this.level());
             String id = stat.getName();
+            if (id.endsWith("minecraft.air")){
+                Constants.LOG.error("mixin of awardStat found air as crafted item (issue #3)");
+            }
             savedData.map.put(id,savedData.map.getOrDefault(id,0)+amount);
             savedData.setDirty();
         }

@@ -31,6 +31,7 @@ public abstract class RecipeManagerMixin {
         ItemStack result = recipeHolder.value().assemble(input);
         Item item = result.getItem();
         TimesCraftedSavedData savedData = TimesCraftedSavedData.get(((ServerLevel) level));
+        //TODO I should change this to just item.toString(), but that would break compatibility with v1.0
         String key = "minecraft.crafted:"+item.toString().replace(':','.');
         if (!savedData.map.containsKey(key)) return;
         if (savedData.map.get(key) + result.getCount() > CommonClass.maxTimesCrafted.get(item)) {
