@@ -85,35 +85,39 @@ public class CommonClass {
                 reader.beginObject();
                 try {
                     reader.nextName();
-                } catch (IOException e) {
+                } catch (IllegalStateException e) {
                     Constants.LOG.error("Config has empty json object (index {})",count);
                     reader.endObject();
+                    count++;
                     continue;
                 }
 
                 String id = "";
                 try {
                     id = reader.nextString();
-                } catch (IOException e) {
+                } catch (IllegalStateException e) {
                     Constants.LOG.error("Next value in config is not string (index {})",count);
                     reader.endObject();
+                    count++;
                     continue;
                 }
 
                 try {
                     reader.nextName();
-                } catch (IOException e) {
+                } catch (IllegalStateException e) {
                     Constants.LOG.error("Json object ends with only one value (index {})",count);
                     reader.endObject();
+                    count++;
                     continue;
                 }
 
                 int max = 0;
                 try {
                     max = reader.nextInt();
-                } catch (IOException e) {
+                } catch (IllegalStateException e) {
                     Constants.LOG.error("Next value in config is not integer (index {})",count);
                     reader.endObject();
+                    count++;
                     continue;
                 }
 
