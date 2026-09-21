@@ -3,6 +3,13 @@ plugins {
     id 'net.neoforged.moddev'
 }
 
+repositories {
+    maven {
+        name 'Xander Maven'
+        url 'https://maven.isxander.dev/releases'
+    }
+}
+
 neoForge {
     version = neoforge_version
     // Automatically enable neoforge AccessTransformers if the file exists
@@ -37,6 +44,10 @@ neoForge {
             sourceSet sourceSets.main
         }
     }
+}
+
+dependencies {
+    implementation("dev.isxander:yet-another-config-lib:${project.neo_yacl_version}")
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
