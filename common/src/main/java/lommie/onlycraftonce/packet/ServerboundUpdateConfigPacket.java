@@ -15,7 +15,7 @@ import java.util.HashMap;
 public record ServerboundUpdateConfigPacket(HashMap<Item,Integer> changed_entries) implements CustomPacketPayload {
     public static final Type<ServerboundUpdateConfigPacket> TYPE = new Type<>(Identifier.fromNamespaceAndPath(Constants.MOD_ID,"update_config"));
     public static final StreamCodec<FriendlyByteBuf,ServerboundUpdateConfigPacket> CODEC = StreamCodec.composite(
-            CommonClass.CONFIG_CODEC,
+            CommonClass.CONFIG_STREAM_CODEC,
             ServerboundUpdateConfigPacket::changed_entries,
             ServerboundUpdateConfigPacket::new);
 
@@ -24,8 +24,8 @@ public record ServerboundUpdateConfigPacket(HashMap<Item,Integer> changed_entrie
         return TYPE;
     }
 
-    public void handle(ServerboundUpdateConfigPacket packet, ServerPlayer player){
-        // does player have permission "permission_name"?
+    public static void handle(ServerboundUpdateConfigPacket packet, ServerPlayer player){
+        // does player have permission "modid.change_config"?
         // update entries
     }
 }

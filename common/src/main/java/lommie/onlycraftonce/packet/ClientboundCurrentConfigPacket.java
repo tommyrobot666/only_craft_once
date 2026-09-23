@@ -15,7 +15,7 @@ import java.util.HashMap;
 public record ClientboundCurrentConfigPacket(HashMap<Item,Integer> config) implements CustomPacketPayload {
     public static final Type<ClientboundCurrentConfigPacket> TYPE = new Type<>(Identifier.fromNamespaceAndPath(Constants.MOD_ID,"current_config"));
     public static final StreamCodec<FriendlyByteBuf,ClientboundCurrentConfigPacket> CODEC = StreamCodec.composite(
-            CommonClass.CONFIG_CODEC,
+            CommonClass.CONFIG_STREAM_CODEC,
             ClientboundCurrentConfigPacket::config,
             ClientboundCurrentConfigPacket::new);
 
@@ -24,7 +24,7 @@ public record ClientboundCurrentConfigPacket(HashMap<Item,Integer> config) imple
         return TYPE;
     }
 
-    public void handle(ClientboundCurrentConfigPacket packet){
+    public static void handle(ClientboundCurrentConfigPacket packet){
         // send data to yacl screen
     }
 }
