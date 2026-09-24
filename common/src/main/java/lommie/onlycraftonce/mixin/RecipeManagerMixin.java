@@ -1,6 +1,7 @@
 package lommie.onlycraftonce.mixin;
 
 import lommie.onlycraftonce.CommonClass;
+import lommie.onlycraftonce.Config;
 import lommie.onlycraftonce.saveddata.TimesCraftedSavedData;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
@@ -34,7 +35,7 @@ public abstract class RecipeManagerMixin {
         //TODO I should change this to just item.toString(), but that would break compatibility with v1.0
         String key = "minecraft.crafted:"+item.toString().replace(':','.');
         if (!savedData.map.containsKey(key)) return;
-        if (savedData.map.get(key) + result.getCount() > CommonClass.maxTimesCrafted.get(item)) {
+        if (savedData.map.get(key) + result.getCount() > Config.maxTimesCrafted.get(item)) {
             cir.setReturnValue(Optional.empty());
         }
     }
