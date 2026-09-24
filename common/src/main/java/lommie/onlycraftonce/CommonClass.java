@@ -42,7 +42,6 @@ public class CommonClass {
             Items.MACE, 3,
             Items.IRON_NUGGET, 18
     ));
-    public static final String YACL_MODID = "minecraft";
 
     public static void init() {
         if (Services.PLATFORM.isModLoaded("only_craft_once")) {
@@ -50,6 +49,10 @@ public class CommonClass {
         }
 
         tryToLoadConfigAndHandleErrors();
+
+        if (Services.PLATFORM.isModLoaded(Constants.YACL_MODID)){
+            ModPackets.registerServer();
+        }
     }
 
     private static void tryToLoadConfigAndHandleErrors() {

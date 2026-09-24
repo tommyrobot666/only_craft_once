@@ -15,7 +15,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class FabricNetworkPacketRegister implements INetworkPacketRegister {
-//    @Environment(EnvType.SERVER)
     @Override
     public <P extends CustomPacketPayload> void registerServerbound(CustomPacketPayload.Type<P> type, StreamCodec<RegistryFriendlyByteBuf, P> codec, BiConsumer<P, ServerPlayer> handler) {
         PayloadTypeRegistry.serverboundPlay().register(type,codec);

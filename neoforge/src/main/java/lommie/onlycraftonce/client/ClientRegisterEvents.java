@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 
 @EventBusSubscriber(value = Dist.CLIENT, modid = Constants.MOD_ID)
 public class ClientRegisterEvents {
-    @SubscribeEvent
+//    @SubscribeEvent
     public static void register(RegisterClientPayloadHandlersEvent event){
         NeoForgeNetworkPacketRegister.deferredClientboundRegistrations.forEach(
                 (packet) -> registerPacket(event,packet.type(),packet.handler())
