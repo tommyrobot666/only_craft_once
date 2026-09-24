@@ -6,8 +6,9 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
-interface INetworkPacketRegister<P extends CustomPacketPayload> {
-    void registerServerbound(CustomPacketPayload.Type<P> type, StreamCodec<RegistryFriendlyByteBuf,P> codec, BiConsumer<P, ServerPlayer> handler);
-    void registerClientbound(CustomPacketPayload.Type<P> type, StreamCodec<RegistryFriendlyByteBuf,P> codec, BiConsumer<P> handler);
+public interface INetworkPacketRegister {
+    <P extends CustomPacketPayload> void registerServerbound(CustomPacketPayload.Type<P> type, StreamCodec<RegistryFriendlyByteBuf,P> codec, BiConsumer<P, ServerPlayer> handler);
+    <P extends CustomPacketPayload> void registerClientbound(CustomPacketPayload.Type<P> type, StreamCodec<RegistryFriendlyByteBuf,P> codec, Consumer<P> handler);
 }

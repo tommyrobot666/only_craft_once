@@ -17,6 +17,9 @@
     "entrypoints": {
         "main": [
             "lommie.onlycraftonce.OnlyCraftOnce"
+        ],
+        "client": [
+            "lommie.onlycraftonce.client.OnlyCraftOnceClient"
         ]
     },
     "mixins": [

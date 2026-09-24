@@ -2,8 +2,11 @@ package lommie.onlycraftonce;
 
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import lommie.onlycraftonce.packet.ModPackets;
 import lommie.onlycraftonce.platform.Services;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -15,10 +18,31 @@ import java.util.Map;
 import java.util.Optional;
 
 public class CommonClass {
+    public static final StreamCodec<RegistryFriendlyByteBuf, HashMap<Item,Integer>> CONFIG_STREAM_CODEC = StreamCodec.of(
+            (b,map) -> {
+                b.writeInt(map.size());
+                map.forEach((item,max) -> {
+                    b.writeUtf(BuiltInRegistries.ITEM.getKey(item).toString());
+                    b.writeInt(max);
+                });
+            },
+            (b) -> {
+                var map = new HashMap<Item,Integer>();
+                int i = b.readInt();
+
+                for (; i > 0; i--) {
+                    map.put(BuiltInRegistries.ITEM.getOptional(Identifier.parse(b.readUtf())).orElseThrow(),
+                            b.readInt());
+                }
+
+                return map;
+            }
+    );
     public static HashMap<Item,Integer> maxTimesCrafted = new HashMap<>(Map.of(
             Items.MACE, 3,
             Items.IRON_NUGGET, 18
     ));
+    public static final String YACL_MODID = "minecraft";
 
     public static void init() {
         if (Services.PLATFORM.isModLoaded("only_craft_once")) {
