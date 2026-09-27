@@ -6,6 +6,8 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +27,16 @@ public class NeoForgeNetworkPacketRegister implements INetworkPacketRegister {
     public <P extends CustomPacketPayload> void registerClientbound(CustomPacketPayload.Type<P> type, StreamCodec<RegistryFriendlyByteBuf, P> codec, Consumer<P> handler) {
         assert(FMLEnvironment.getDist().isClient());
         deferredClientboundRegistrations.add(new DeferredClientbound<>(type,codec,handler));
+    }
+
+    @Override
+    public void sendClientbound(CustomPacketPayload packetPayload, ServerPlayer player) {
+        PacketDistributor.sendToPlayer(player,packetPayload);
+    }
+
+    @Override
+    public void sendServerbound(CustomPacketPayload packetPayload) {
+        ClientPacketDistributor.sendToServer(packetPayload);
     }
 
     public record DeferredServerbound<P extends CustomPacketPayload>(CustomPacketPayload.Type<P> type, StreamCodec<RegistryFriendlyByteBuf, P> codec, BiConsumer<P, ServerPlayer> handler){

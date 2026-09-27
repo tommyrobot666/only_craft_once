@@ -1,6 +1,9 @@
 package lommie.onlycraftonce.packet;
 
+import lommie.onlycraftonce.Config;
 import lommie.onlycraftonce.Constants;
+import lommie.onlycraftonce.platform.Services;
+import lommie.onlycraftonce.server.ModPermissions;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -19,6 +22,8 @@ public record ServerboundRequestCurrentConfigPacket() implements CustomPacketPay
 
     public static void handle(ServerboundRequestCurrentConfigPacket packet, ServerPlayer player){
         // does player have permission "modid.view_config"?
+        if (!player.permissions().hasPermission(ModPermissions.VIEW_CONFIG)) return;
         // send ClientboundCurrentConfigPacket
+        Services.NETWORKING.sendClientbound(new ClientboundCurrentConfigPacket(Config.maxTimesCrafted),player);
     }
 }

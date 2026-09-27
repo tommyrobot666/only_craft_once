@@ -162,6 +162,22 @@ public class Config {
     }
 
     public static void saveConfig(){
-        // TODO
+        Constants.LOG.info("Saving config");
+        try (JsonWriter writer = new JsonWriter(Files.newBufferedWriter(Services.PLATFORM.configFile()))) {
+            writer.beginArray();
+            for (Item item : Config.maxTimesCrafted.keySet()) {
+                writer.beginObject();
+                writer.name("id");
+                writer.value(BuiltInRegistries.ITEM.getKey(item).toString());
+                writer.name("max");
+                writer.value(Config.maxTimesCrafted.get(item));
+                writer.endObject();
+            }
+            writer.endArray();
+            writer.close();
+        } catch (IOException ex) {
+            Constants.LOG.error("Error while saving config");
+            ex.printStackTrace();
+        }
     }
 }

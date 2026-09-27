@@ -1,9 +1,9 @@
 package lommie.onlycraftonce.packet;
 
 
-import lommie.onlycraftonce.CommonClass;
 import lommie.onlycraftonce.Config;
 import lommie.onlycraftonce.Constants;
+import lommie.onlycraftonce.yacl.YaclState;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -26,6 +26,7 @@ public record ClientboundCurrentConfigPacket(HashMap<Item,Integer> config) imple
     }
 
     public static void handle(ClientboundCurrentConfigPacket packet){
-        // send data to yacl screen
+        YaclState.config = packet.config;
+        YaclState.changed = true;
     }
 }

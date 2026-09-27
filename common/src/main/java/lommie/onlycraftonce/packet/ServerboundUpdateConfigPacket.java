@@ -1,8 +1,8 @@
 package lommie.onlycraftonce.packet;
 
-import lommie.onlycraftonce.CommonClass;
 import lommie.onlycraftonce.Config;
 import lommie.onlycraftonce.Constants;
+import lommie.onlycraftonce.server.ModPermissions;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -27,6 +27,15 @@ public record ServerboundUpdateConfigPacket(HashMap<Item,Integer> changed_entrie
 
     public static void handle(ServerboundUpdateConfigPacket packet, ServerPlayer player){
         // does player have permission "modid.change_config"?
+        if (!player.permissions().hasPermission(ModPermissions.CHANGE_CONFIG)) return;
         // update entries
+        for (Item entry : packet.changed_entries.keySet()){
+            if (packet.changed_entries.get(entry) < 0)
+                Config.maxTimesCrafted.remove(entry);
+            else
+                Config.maxTimesCrafted.put(entry,packet.changed_entries.get(entry));
+        }
+
+        Config.saveConfig();
     }
 }
