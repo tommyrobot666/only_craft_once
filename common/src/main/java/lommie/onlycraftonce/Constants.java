@@ -9,5 +9,6 @@ public class Constants {
     public static final String MOD_NAME = "OnlyCraftOnce";
     public static final Logger LOG = LoggerFactory.getLogger(MOD_NAME);
     public static final String YACL_MODID = "yet_another_config_lib_v3";
-
+    public static final String CONFIG_OPTION_NAME = "Max craftable";
+    public static final String CONFIG_OPTION_DESCRIPTION = "The maximum amount of times an item is allowed to be crafted";
 }

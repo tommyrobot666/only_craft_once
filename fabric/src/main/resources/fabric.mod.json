@@ -20,7 +20,8 @@
         ],
         "client": [
             "lommie.onlycraftonce.client.OnlyCraftOnceClient"
-        ]
+        ],
+        "modmenu": [ "lommie.onlycraftonce.ModMenuApiImpl" ]
     },
     "mixins": [
         "${mod_id}.mixins.json",
@@ -33,7 +34,8 @@
         "java": ">=${java_version}"
     },
     "suggests": {
-        "yet_another_config_lib_v3": "*"
+        "yet_another_config_lib_v3": "*",
+        "modmenu": "*"
     }
 }
   
