@@ -16,11 +16,9 @@ public class YACLScreen {
             return parent;
         }
 
-        ConfigCategory.Builder firstCategory = ConfigCategory.createBuilder();
-//        OptionGroup.Builder rootGroup = firstCategory.rootGroupBuilder();
         return YetAnotherConfigLib.createBuilder()
                 .title(Component.literal(Constants.MOD_ID))
-                .category(firstCategory
+                .category(ConfigCategory.createBuilder()
                         .name(Component.translatableWithFallback(Constants.MOD_ID+".name",Constants.MOD_NAME))
                         .group(ListOption.<String>createBuilder()
                                 .name(Component.translatableWithFallback(Constants.MOD_ID+".config_group",Constants.CONFIG_OPTION_NAME))

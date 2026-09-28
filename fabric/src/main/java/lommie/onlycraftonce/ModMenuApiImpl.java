@@ -3,12 +3,14 @@ package lommie.onlycraftonce;
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
 import dev.isxander.yacl3.api.*;
-import dev.isxander.yacl3.api.controller.StringControllerBuilder;
 import lommie.onlycraftonce.platform.Services;
+import lommie.onlycraftonce.yacl.MaxCraftableEntry;
+import lommie.onlycraftonce.yacl.MaxCraftableEntryControllerBuilder;
+import lommie.onlycraftonce.yacl.YaclState;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Items;
 
-import java.util.List;
 import java.util.Map;
 
 public class ModMenuApiImpl implements ModMenuApi {
@@ -22,20 +24,16 @@ public class ModMenuApiImpl implements ModMenuApi {
         return Map.of(Constants.MOD_ID, new ConfigScreenFactory<>() {
             @Override
             public Screen create(Screen parent) {
-                ConfigCategory.Builder firstCategory = ConfigCategory.createBuilder();
-//                OptionGroup.Builder rootGroup = firstCategory.rootGroupBuilder();
                 return YetAnotherConfigLib.createBuilder()
                         .title(Component.literal(Constants.MOD_ID))
-                        .category(firstCategory
+                        .category(ConfigCategory.createBuilder()
                                 .name(Component.translatableWithFallback(Constants.MOD_ID+".name",Constants.MOD_NAME))
-                                .group(ListOption.<String>createBuilder()
+                                .group(ListOption.<MaxCraftableEntry>createBuilder()
                                         .name(Component.translatableWithFallback(Constants.MOD_ID+".config_group",Constants.CONFIG_OPTION_NAME))
                                         .description(OptionDescription.of(Component.translatableWithFallback(Constants.MOD_ID+".config_group_description",Constants.CONFIG_OPTION_DESCRIPTION)))
-                                        .binding(List.of(),() -> List.of(), (new_value) -> {
-                                            return;
-                                        })
-                                        .controller(StringControllerBuilder::create)
-                                        .initial("")
+                                        .binding(MaxCraftableEntry.toList(YaclState.config),() -> MaxCraftableEntry.toList(YaclState.config), (new_value) -> YaclState.config = MaxCraftableEntry.toMap(new_value))
+                                        .controller(MaxCraftableEntryControllerBuilder::create)
+                                        .initial(new MaxCraftableEntry(Items.AIR,3))
                                         .build()
                                 )
                                 .build()
