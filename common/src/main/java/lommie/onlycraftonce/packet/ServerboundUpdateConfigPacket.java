@@ -10,6 +10,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.Permissions;
 import net.minecraft.world.item.Item;
 import org.jspecify.annotations.NonNull;
 
@@ -29,7 +30,7 @@ public record ServerboundUpdateConfigPacket(HashMap<Item,Integer> changed_entrie
 
     public static void handle(ServerboundUpdateConfigPacket packet, ServerPlayer player){
         // does player have permission "modid.change_config"?
-        if (!player.permissions().hasPermission(ModPermissions.CHANGE_CONFIG)) {
+        if (!(player.permissions().hasPermission(ModPermissions.CHANGE_CONFIG) || player.permissions().hasPermission(Permissions.COMMANDS_OWNER))) {
             player.sendSystemMessage(Component.translatableWithFallback(Constants.MOD_ID+".no_permissions.change_config",Constants.NO_PERMISSIONS_CHANGE_CONFIG).withColor(TextColor.RED));
             return;
         }

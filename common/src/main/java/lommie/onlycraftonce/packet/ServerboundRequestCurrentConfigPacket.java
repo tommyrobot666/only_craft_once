@@ -11,6 +11,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.Permissions;
 import org.jspecify.annotations.NonNull;
 
 public record ServerboundRequestCurrentConfigPacket() implements CustomPacketPayload {
@@ -24,7 +25,7 @@ public record ServerboundRequestCurrentConfigPacket() implements CustomPacketPay
 
     public static void handle(ServerboundRequestCurrentConfigPacket packet, ServerPlayer player){
         // does player have permission "modid.view_config"?
-        if (!player.permissions().hasPermission(ModPermissions.VIEW_CONFIG)) {
+        if (!(player.permissions().hasPermission(ModPermissions.VIEW_CONFIG) || player.permissions().hasPermission(Permissions.COMMANDS_OWNER))) {
             player.sendSystemMessage(Component.translatableWithFallback(Constants.MOD_ID+".no_permissions.view_config",Constants.NO_PERMISSIONS_VIEW_CONFIG).withColor(TextColor.RED));
             return;
         }
