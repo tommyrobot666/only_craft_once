@@ -107,25 +107,25 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
     }
 
     class TextInputBox {
-            protected final boolean instantApply = true;
+        protected final boolean instantApply = true;
 
-            protected String inputField;
-            protected Dimension<Integer> inputFieldBounds;
-            protected boolean inputFieldFocused;
+        protected String inputField;
+        protected Dimension<Integer> inputFieldBounds;
+        protected boolean inputFieldFocused;
 
-            protected int caretPos;
-            protected int previousCaretPos;
-            protected int selectionLength;
-            protected int renderOffset;
+        protected int caretPos;
+        protected int previousCaretPos;
+        protected int selectionLength;
+        protected int renderOffset;
 
-            protected UndoRedoHelper undoRedoHelper;
+        protected UndoRedoHelper undoRedoHelper;
 
-            protected float ticks;
-            protected float caretTicks;
+        protected float ticks;
+        protected float caretTicks;
 
-            private final Component emptyText = Component.literal("...");
+        private final Component emptyText = Component.literal("...");
 
-            protected void extractValueText (GuiGraphicsExtractor graphics,int mouseX, int mouseY, float a, ControllerWidget w){
+        protected void extractValueText (GuiGraphicsExtractor graphics,int mouseX, int mouseY, float a, ControllerWidget w){
             Component valueText = getValueText();
             if (!isHovered(w))
                 valueText = Component.literal(GuiUtils.shortenString(valueText.getString(), textRenderer, getMaxUnwrapLength(), "...")).setStyle(valueText.getStyle());
@@ -173,11 +173,11 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
             }
         }
 
-            private boolean isHoveredInputField ( double mouseX, double mouseY){
+        private boolean isHoveredInputField ( double mouseX, double mouseY){
             return inputFieldBounds.isPointInside((int) mouseX, (int) mouseY);
         }
 
-            public boolean mouseClicked (@NonNull MouseButtonEvent event,boolean doubleClick,ControllerWidget w){
+        public boolean mouseClicked (@NonNull MouseButtonEvent event,boolean doubleClick,ControllerWidget w){
             if (isAvailable() && getDimension().isPointInside((int) event.x(), (int) event.y())) {
                 inputFieldFocused = true;
                 updateTextInputFocus(true,w);
@@ -220,7 +220,7 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
             return inputField.length();
         }
 
-            public boolean keyPressed (@NonNull KeyEvent event,ControllerWidget w){
+        public boolean keyPressed (@NonNull KeyEvent event,ControllerWidget w){
             if (!inputFieldFocused)
                 return false;
 
@@ -339,13 +339,13 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
             return false;
         }
 
-            protected boolean doPaste () {
+        protected boolean doPaste () {
             this.write(client.keyboardHandler.getClipboard());
             updateUndoHistory();
             return true;
         }
 
-            protected boolean doCopy () {
+        protected boolean doCopy () {
             if (selectionLength != 0) {
                 client.keyboardHandler.setClipboard(getSelection());
                 return true;
@@ -353,7 +353,7 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
             return false;
         }
 
-            protected boolean doCut () {
+        protected boolean doCut () {
             if (selectionLength != 0) {
                 client.keyboardHandler.setClipboard(getSelection());
                 this.write("");
@@ -363,14 +363,14 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
             return false;
         }
 
-            protected boolean doSelectAll () {
+        protected boolean doSelectAll () {
             caretPos = inputField.length();
             checkRenderOffset();
             selectionLength = -caretPos;
             return true;
         }
 
-            protected void checkRenderOffset () {
+        protected void checkRenderOffset () {
             if (textRenderer.width(inputField) < getUnshiftedLength()) {
                 renderOffset = 0;
                 return;
@@ -398,7 +398,7 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
             return true;
         }
 
-            protected void doBackspace () {
+        protected void doBackspace () {
             if (selectionLength != 0) {
                 write("");
             } else if (caretPos > 0) {
@@ -410,7 +410,7 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
             updateUndoHistory();
         }
 
-            protected void doDelete () {
+        protected void doDelete () {
             if (selectionLength != 0) {
                 write("");
             } else if (caretPos < inputField.length()) {
@@ -419,7 +419,7 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
             updateUndoHistory();
         }
 
-            public void write (String string){
+        public void write (String string){
             if (selectionLength == 0) {
                 if (modifyInput(builder -> builder.insert(caretPos, string))) {
                     caretPos += string.length();
@@ -437,7 +437,7 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
             }
         }
 
-            public boolean modifyInput (Consumer < StringBuilder > consumer) {
+        public boolean modifyInput (Consumer < StringBuilder > consumer) {
             StringBuilder temp = new StringBuilder(inputField);
             consumer.accept(temp);
             inputField = temp.toString();
@@ -446,35 +446,35 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
             return true;
         }
 
-            protected void updateUndoHistory () {
+        protected void updateUndoHistory () {
     //        undoRedoHelper.save(inputField, caretPos, selectionLength);
         }
 
-            public int getUnshiftedLength () {
+        public int getUnshiftedLength () {
             if (optionNameString.isEmpty())
                 return getDimension().width() - getXPadding() * 2;
             return getDimension().width() / 8 * 5;
         }
 
-            public int getMaxUnwrapLength () {
+        public int getMaxUnwrapLength () {
             if (optionNameString.isEmpty())
                 return getDimension().width() - getXPadding() * 2;
             return getDimension().width() / 2;
         }
 
-            public int getSelectionStart () {
+        public int getSelectionStart () {
             return Math.min(caretPos, caretPos + selectionLength);
         }
 
-            public int getSelectionEnd () {
+        public int getSelectionEnd () {
             return Math.max(caretPos, caretPos + selectionLength);
         }
 
-            protected String getSelection () {
+        protected String getSelection () {
             return inputField.substring(getSelectionStart(), getSelectionEnd());
         }
 
-            protected int findSpaceIndex ( boolean reverse){
+        protected int findSpaceIndex ( boolean reverse){
             int i;
             int fromIndex = caretPos;
             if (reverse) {
@@ -492,13 +492,13 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
             return i;
         }
 
-            public void setFocused ( boolean focused, ControllerWidget w){
+        public void setFocused ( boolean focused, ControllerWidget w){
             MaxCraftableEntryControllerElement.super.setFocused(focused);
             inputFieldFocused = focused;
             updateTextInputFocus(focused,w);
         }
 
-            public void unfocus (ControllerWidget w) {
+        public void unfocus (ControllerWidget w) {
             MaxCraftableEntryControllerElement.super.unfocus();
             inputFieldFocused = false;
             renderOffset = 0;
@@ -506,28 +506,28 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
             updateTextInputFocus(false,w);
         }
 
-            private void updateTextInputFocus ( boolean focused, ControllerWidget w){
+        private void updateTextInputFocus ( boolean focused, ControllerWidget w){
             //? if >=26.3 {
             Minecraft.getInstance().onTextInputFocusChange(w, focused);
             //?}
         }
 
-            public void setDimension (Dimension < Integer > dim, ControllerWidget w) {
+        public void setDimension (Dimension < Integer > dim, ControllerWidget w) {
             MaxCraftableEntryControllerElement.super.setDimension(dim);
 
             int width = Math.max(6, Math.min(textRenderer.width(getValueText()), getUnshiftedLength()));
             inputFieldBounds = Dimension.ofInt(dim.xLimit() - getXPadding() - width, dim.centerY() - textRenderer.lineHeight / 2, width, textRenderer.lineHeight);
         }
 
-            public boolean isHovered (ControllerWidget w) {
+        public boolean isHovered (ControllerWidget w) {
             return MaxCraftableEntryControllerElement.super.isHovered() || inputFieldFocused;
         }
 
-            protected int getUnhoveredControlWidth (ControllerWidget w) {
+        protected int getUnhoveredControlWidth (ControllerWidget w) {
             return !isHovered(w) ? Math.min(getHoveredControlWidth(), getMaxUnwrapLength()) : getHoveredControlWidth();
         }
 
-            protected int getHoveredControlWidth () {
+        protected int getHoveredControlWidth () {
             return Math.min(textRenderer.width(getValueText()), getUnshiftedLength());
         }
     }
