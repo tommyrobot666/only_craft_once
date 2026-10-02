@@ -7,7 +7,6 @@ import dev.isxander.yacl3.gui.controllers.ControllerWidget;
 import dev.isxander.yacl3.gui.utils.GuiUtils;
 import dev.isxander.yacl3.gui.utils.ItemRegistryHelper;
 import dev.isxander.yacl3.gui.utils.UndoRedoHelper;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
@@ -19,6 +18,7 @@ import net.minecraft.world.item.ItemStack;
 import org.jspecify.annotations.NonNull;
 
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraftableEntryController> {
 
@@ -32,8 +32,10 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
         super(control, screen, dim);
         currentItem = control.option.pendingValue().item();
         itemInputField.inputField = BuiltInRegistries.ITEM.getKey(currentItem).toString();
+        itemInputField.getValue = () -> Component.literal(BuiltInRegistries.ITEM.getKey(currentItem).toString());
         currentMax = control.option.pendingValue().max();
         maxInputField.inputField = String.valueOf(currentMax);
+        maxInputField.getValue = () -> Component.literal(String.valueOf(currentMax));
     }
 
     @Override
@@ -44,16 +46,12 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
     @Override
     protected void extractValueText(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
         itemInputField.extractValueText(graphics,mouseX,mouseY,a,this);
-
-        var oldDimension = getDimension();
-        setDimension(getDimension().withWidth(getDimension().width()));
-        super.extractValueText(graphics, mouseX, mouseY, a);
-        setDimension(oldDimension);
+        maxInputField.extractValueText(graphics,mouseX,mouseY,a,this);
         if (currentItem != null) {
             extractFakeItem(
                     graphics,
                     currentItem,
-                    getDimension().xLimit() - getXPadding() + 2,
+                    getDimension().xLimit() - getXPadding() + 2 -20 -16,
                     getDimension().y() + 2
             );
         }
@@ -88,7 +86,11 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
 
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        return itemInputField.mouseClicked(event,doubleClick,this);
+        if (!(itemInputField.mouseClicked(event,doubleClick,this) || maxInputField.mouseClicked(event,doubleClick,this))){
+            unfocus();
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -97,16 +99,27 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
     }
 
     @Override
+    public boolean charTyped(CharacterEvent event) {
+        return itemInputField.charTyped(event);
+    }
+
+    @Override
     public void setFocused(boolean focused) {
-        itemInputField.setFocused(focused, this);
+        super.setFocused(true);
+        itemInputField.setFocused(false, this);
+        maxInputField.setFocused(false, this);
     }
 
     @Override
     public void setDimension(Dimension<Integer> dim) {
-        itemInputField.setDimension(dim,this);
+        super.setDimension(dim);
+        itemInputField.setDimension(dim.withWidth(dim.width()-20));
+        maxInputField.setDimension(dim.moved(dim.width()-20,0).withWidth(20));
     }
 
     class TextInputBox {
+        Supplier<Component> getValue;
+
         protected final boolean instantApply = true;
 
         protected String inputField;
@@ -123,10 +136,10 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
         protected float ticks;
         protected float caretTicks;
 
-        private final Component emptyText = Component.literal("...");
+        private final Component emptyText = Component.literal("emptyyy");
 
         protected void extractValueText (GuiGraphicsExtractor graphics,int mouseX, int mouseY, float a, ControllerWidget w){
-            Component valueText = getValueText();
+            Component valueText = getValue.get();
             if (!isHovered(w))
                 valueText = Component.literal(GuiUtils.shortenString(valueText.getString(), textRenderer, getMaxUnwrapLength(), "...")).setStyle(valueText.getStyle());
 
@@ -137,12 +150,12 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
             if (isHovered(w)) {
                 ticks += a;
 
-                String text = getValueText().getString();
+                String text = getValue.get().getString();
 
                 graphics.fill(inputFieldBounds.x(), inputFieldBounds.yLimit(), inputFieldBounds.xLimit(), inputFieldBounds.yLimit() + 1, -1);
                 graphics.fill(inputFieldBounds.x() + 1, inputFieldBounds.yLimit() + 1, inputFieldBounds.xLimit() + 1, inputFieldBounds.yLimit() + 2, 0xFF404040);
 
-                if (inputFieldFocused || focused) {
+                if (inputFieldFocused) {
                     if (caretPos > text.length())
                         caretPos = text.length();
 
@@ -186,7 +199,7 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
                     caretPos = getDefaultCaretPos();
                 } else {
                     // gets the appropriate caret position for where you click
-                    int textX = (int) event.x() - (inputFieldBounds.xLimit() - textRenderer.width(getValueText()));
+                    int textX = (int) event.x() - (inputFieldBounds.xLimit() - textRenderer.width(getValue.get()));
                     int pos = -1;
                     int currentWidth = 0;
                     for (char ch : inputField.toCharArray()) {
@@ -493,13 +506,11 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
         }
 
         public void setFocused ( boolean focused, ControllerWidget w){
-            MaxCraftableEntryControllerElement.super.setFocused(focused);
             inputFieldFocused = focused;
             updateTextInputFocus(focused,w);
         }
 
         public void unfocus (ControllerWidget w) {
-            MaxCraftableEntryControllerElement.super.unfocus();
             inputFieldFocused = false;
             renderOffset = 0;
             if (!instantApply) updateControl();
@@ -507,15 +518,13 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
         }
 
         private void updateTextInputFocus ( boolean focused, ControllerWidget w){
-            //? if >=26.3 {
-            Minecraft.getInstance().onTextInputFocusChange(w, focused);
-            //?}
+//            //? if >=26.3 {
+//            Minecraft.getInstance().onTextInputFocusChange(w, focused);
+//            //?}
         }
 
-        public void setDimension (Dimension < Integer > dim, ControllerWidget w) {
-            MaxCraftableEntryControllerElement.super.setDimension(dim);
-
-            int width = Math.max(6, Math.min(textRenderer.width(getValueText()), getUnshiftedLength()));
+        public void setDimension (Dimension < Integer > dim) {
+            int width = Math.max(6, Math.min(textRenderer.width(getValue.get()), getUnshiftedLength()));
             inputFieldBounds = Dimension.ofInt(dim.xLimit() - getXPadding() - width, dim.centerY() - textRenderer.lineHeight / 2, width, textRenderer.lineHeight);
         }
 
@@ -528,7 +537,7 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
         }
 
         protected int getHoveredControlWidth () {
-            return Math.min(textRenderer.width(getValueText()), getUnshiftedLength());
+            return Math.min(textRenderer.width(getValue.get()), getUnshiftedLength());
         }
     }
 
