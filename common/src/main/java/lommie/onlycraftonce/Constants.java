@@ -19,6 +19,6 @@ public class Constants {
     public static final String NO_PERMISSIONS_CHANGE_CONFIG = "You do not have permission to change the "+MOD_NAME+" configuration!";
     public static final String CONFIG_ERROR_TIMEOUT = "Receiving the server's config took too long. Check chat for an \"You don't have permission...\" error. If you don't see any error, then close this screen and wait a bit before reopening";
 
-    public static final int GET_CONFIG_TRYS = 9;
-    public static final int GET_CONFIG_WAIT = 300;
+    public static final int GET_CONFIG_TRYS = 1;
+    public static final int GET_CONFIG_WAIT = 1;
 }

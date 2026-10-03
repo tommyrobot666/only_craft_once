@@ -22,6 +22,7 @@ import java.util.function.Supplier;
 
 public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraftableEntryController> {
 
+    private static final int MAX_INPUT_FIELD_WIDTH = 20;
     private Item currentItem;
     private int currentMax;
 
@@ -32,15 +33,21 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
         super(control, screen, dim);
         currentItem = control.option.pendingValue().item();
         itemInputField.inputField = BuiltInRegistries.ITEM.getKey(currentItem).toString();
-        itemInputField.getValue = () -> Component.literal(BuiltInRegistries.ITEM.getKey(currentItem).toString());
+        itemInputField.getCurrentValue = () -> Component.literal(BuiltInRegistries.ITEM.getKey(currentItem).toString());
+        itemInputField.inputFieldFocusedEvent = () -> {
+            if (itemInputField.inputFieldFocused) maxInputField.inputFieldFocused = false;
+        };
         currentMax = control.option.pendingValue().max();
         maxInputField.inputField = String.valueOf(currentMax);
-        maxInputField.getValue = () -> Component.literal(String.valueOf(currentMax));
+        maxInputField.getCurrentValue = () -> Component.literal(String.valueOf(currentMax));
+        maxInputField.inputFieldFocusedEvent = () -> {
+            if (maxInputField.inputFieldFocused) itemInputField.inputFieldFocused = false;
+        };
     }
 
     @Override
     protected int getHoveredControlWidth() {
-        return getUnhoveredControlWidth();
+        return itemInputField.getHoveredControlWidth()+16+maxInputField.getHoveredControlWidth();
     }
 
     @Override
@@ -51,7 +58,7 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
             extractFakeItem(
                     graphics,
                     currentItem,
-                    getDimension().xLimit() - getXPadding() + 2 -20 -16,
+                    getDimension().xLimit() - getXPadding() + 2 -MAX_INPUT_FIELD_WIDTH -16,
                     getDimension().y() + 2
             );
         }
@@ -73,7 +80,7 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
         graphics.fakeItem(stack, x, y);
     }
     void updateCurrentItem() {
-        currentItem = ItemRegistryHelper.getItemFromName(itemInputField.inputField, null);
+        currentItem = ItemRegistryHelper.getItemFromName(itemInputField.inputField, currentItem);
     }
 
     void updateCurrentMax() {
@@ -86,7 +93,11 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
 
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        if (!(itemInputField.mouseClicked(event,doubleClick,this) || maxInputField.mouseClicked(event,doubleClick,this))){
+        boolean b1 = itemInputField.mouseClicked(event,doubleClick,this);
+        boolean b2 = maxInputField.mouseClicked(event,doubleClick,this);
+        if (!(b1 || b2)){
+            itemInputField.inputFieldFocused = false;
+            maxInputField.inputFieldFocused = false;
             unfocus();
             return false;
         }
@@ -95,30 +106,42 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
 
     @Override
     public boolean keyPressed(KeyEvent event) {
-        return itemInputField.keyPressed(event,this);
+        boolean b1 = itemInputField.keyPressed(event,this);
+        boolean b2 = maxInputField.keyPressed(event,this);
+        return b1 || b2;
     }
 
     @Override
     public boolean charTyped(CharacterEvent event) {
-        return itemInputField.charTyped(event);
+        boolean b1 = itemInputField.charTyped(event);
+        boolean b2 = maxInputField.charTyped(event);
+        return b1 || b2;
     }
 
     @Override
     public void setFocused(boolean focused) {
-        super.setFocused(true);
-        itemInputField.setFocused(false, this);
-        maxInputField.setFocused(false, this);
+        super.setFocused(focused);
+        if (!focused) {
+            itemInputField.setFocused(false, this);
+            maxInputField.setFocused(false, this);
+        }
     }
 
     @Override
     public void setDimension(Dimension<Integer> dim) {
         super.setDimension(dim);
-        itemInputField.setDimension(dim.withWidth(dim.width()-20));
-        maxInputField.setDimension(dim.moved(dim.width()-20,0).withWidth(20));
+        itemInputField.setDimension(dim.withWidth(dim.width()-MAX_INPUT_FIELD_WIDTH).moved(-16,0));
+        maxInputField.setDimension(dim.moved(dim.width()-MAX_INPUT_FIELD_WIDTH,0).withWidth(MAX_INPUT_FIELD_WIDTH));
+    }
+
+    @Override
+    protected int getUnhoveredControlWidth() {
+        return itemInputField.getUnhoveredControlWidth(this)+16+maxInputField.getUnhoveredControlWidth(this);
     }
 
     class TextInputBox {
-        Supplier<Component> getValue;
+        Supplier<Component> getValue = () -> Component.literal(this.inputField);
+        Supplier<Component> getCurrentValue;
 
         protected final boolean instantApply = true;
 
@@ -137,9 +160,13 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
         protected float caretTicks;
 
         private final Component emptyText = Component.literal("emptyyy");
+        private Runnable inputFieldFocusedEvent;
 
         protected void extractValueText (GuiGraphicsExtractor graphics,int mouseX, int mouseY, float a, ControllerWidget w){
+//            Component valueText = getCurrentValue.get();
             Component valueText = getValue.get();
+            if (valueText.getString().isEmpty()) valueText = emptyText;
+
             if (!isHovered(w))
                 valueText = Component.literal(GuiUtils.shortenString(valueText.getString(), textRenderer, getMaxUnwrapLength(), "...")).setStyle(valueText.getStyle());
 
@@ -192,7 +219,7 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
 
         public boolean mouseClicked (@NonNull MouseButtonEvent event,boolean doubleClick,ControllerWidget w){
             if (isAvailable() && getDimension().isPointInside((int) event.x(), (int) event.y())) {
-                inputFieldFocused = true;
+                setInputFieldFocused(true);
                 updateTextInputFocus(true,w);
 
                 if (!isHoveredInputField(event.x(), event.y())) {
@@ -229,7 +256,12 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
             return false;
         }
 
-            protected int getDefaultCaretPos () {
+        private void setInputFieldFocused(boolean b) {
+            inputFieldFocused = b;
+            inputFieldFocusedEvent.run();
+        }
+
+        protected int getDefaultCaretPos () {
             return inputField.length();
         }
 
@@ -506,12 +538,12 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
         }
 
         public void setFocused ( boolean focused, ControllerWidget w){
-            inputFieldFocused = focused;
+            setInputFieldFocused(focused);
             updateTextInputFocus(focused,w);
         }
 
         public void unfocus (ControllerWidget w) {
-            inputFieldFocused = false;
+            setInputFieldFocused(false);
             renderOffset = 0;
             if (!instantApply) updateControl();
             updateTextInputFocus(false,w);
@@ -542,6 +574,8 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
     }
 
     protected void updateControl() {
+        updateCurrentItem();
+        updateCurrentMax();
         control.option.requestSet(new MaxCraftableEntry(currentItem, currentMax));
     }
 
