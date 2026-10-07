@@ -27,6 +27,7 @@ import java.util.Objects;
 public class ModMenuApiImpl implements ModMenuApi {
     static List<MaxCraftableEntry> maxCraftableEntryList;
     static boolean useExperimentalScreen = false;
+    static boolean firstTry = true;
 
     @Override
     public Map<String, ConfigScreenFactory<?>> getProvidedConfigScreenFactories() {
@@ -52,7 +53,7 @@ public class ModMenuApiImpl implements ModMenuApi {
 
                 // check changed for when the packet got there, but too late, so user is reopening screen
                 if (!YaclState.changed) {
-
+                    firstTry = true;
                     Services.NETWORKING.sendServerbound(new ServerboundRequestCurrentConfigPacket());
 
                     for (int i = 0; i < Constants.GET_CONFIG_TRYS; i++) {
@@ -67,6 +68,16 @@ public class ModMenuApiImpl implements ModMenuApi {
 
                 // didn't receive packet in time
                 if (!YaclState.changed){
+                    if (firstTry) return YetAnotherConfigLib.createBuilder()
+                            .title(Component.literal(Constants.MOD_ID))
+                            .category(ConfigCategory.createBuilder()
+                                    .name(Component.translatableWithFallback(Constants.MOD_ID+".try_again",Constants.TRY_AGAIN_ERROR))
+                                    .group(OptionGroup.createBuilder()
+                                            .option(LabelOption.create(Component.translatableWithFallback(Constants.MOD_ID+".try_again",Constants.TRY_AGAIN_ERROR)))
+                                            .build())
+                                    .build())
+                            .build().generateScreen(parent);
+
                     return YetAnotherConfigLib.createBuilder()
                             .title(Component.literal(Constants.MOD_ID))
                             .category(ConfigCategory.createBuilder()
