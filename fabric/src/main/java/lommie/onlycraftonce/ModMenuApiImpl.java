@@ -68,15 +68,18 @@ public class ModMenuApiImpl implements ModMenuApi {
 
                 // didn't receive packet in time
                 if (!YaclState.changed){
-                    if (firstTry) return YetAnotherConfigLib.createBuilder()
+                    if (firstTry) {
+                        firstTry = false;
+                        return YetAnotherConfigLib.createBuilder()
                             .title(Component.literal(Constants.MOD_ID))
                             .category(ConfigCategory.createBuilder()
-                                    .name(Component.translatableWithFallback(Constants.MOD_ID+".try_again",Constants.TRY_AGAIN_ERROR))
+                                    .name(Component.translatableWithFallback(Constants.MOD_ID + ".try_again", Constants.TRY_AGAIN_ERROR))
                                     .group(OptionGroup.createBuilder()
-                                            .option(LabelOption.create(Component.translatableWithFallback(Constants.MOD_ID+".try_again",Constants.TRY_AGAIN_ERROR)))
+                                            .option(LabelOption.create(Component.translatableWithFallback(Constants.MOD_ID + ".try_again", Constants.TRY_AGAIN_ERROR)))
                                             .build())
                                     .build())
                             .build().generateScreen(parent);
+                    }
 
                     return YetAnotherConfigLib.createBuilder()
                             .title(Component.literal(Constants.MOD_ID))
