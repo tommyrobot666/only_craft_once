@@ -3,7 +3,11 @@ package lommie.onlycraftonce;
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
 import dev.isxander.yacl3.api.*;
+import dev.isxander.yacl3.api.controller.IntegerFieldControllerBuilder;
+import dev.isxander.yacl3.api.controller.ItemControllerBuilder;
+import dev.isxander.yacl3.api.controller.TickBoxControllerBuilder;
 import lommie.onlycraftonce.packet.ServerboundRequestCurrentConfigPacket;
+import lommie.onlycraftonce.packet.ServerboundUpdateConfigPacket;
 import lommie.onlycraftonce.platform.Services;
 import lommie.onlycraftonce.yacl.MaxCraftableEntry;
 import lommie.onlycraftonce.yacl.MaxCraftableEntryControllerBuilder;
@@ -11,11 +15,19 @@ import lommie.onlycraftonce.yacl.YaclState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class ModMenuApiImpl implements ModMenuApi {
+    static List<MaxCraftableEntry> maxCraftableEntryList;
+    static boolean useExperimentalScreen = false;
+
     @Override
     public Map<String, ConfigScreenFactory<?>> getProvidedConfigScreenFactories() {
         if (!Services.PLATFORM.isModLoaded(Constants.YACL_MODID)) {
@@ -69,22 +81,106 @@ public class ModMenuApiImpl implements ModMenuApi {
                 // reset changed
                 YaclState.changed = false;
 
+                maxCraftableEntryList = MaxCraftableEntry.toList(YaclState.config);
                 return YetAnotherConfigLib.createBuilder()
                         .title(Component.literal(Constants.MOD_ID))
                         .category(ConfigCategory.createBuilder()
-                                .name(Component.translatableWithFallback(Constants.MOD_ID+".name",Constants.MOD_NAME))
+                                .name(Component.translatableWithFallback(Constants.MOD_ID+".name",Constants.MOD_NAME).append(" Experimental"))
+                                .group(ListOption.<Item>createBuilder()
+                                        .name(Component.translatableWithFallback(Constants.MOD_ID+".config_group_item",Constants.CONFIG_OPTION_ITEM_NAME))
+                                        .description(OptionDescription.of(Component.translatableWithFallback(Constants.MOD_ID+".config_group_item_list_description",Constants.CONFIG_OPTION_ITEM_LIST_DESCRIPTION)))
+                                        .binding(setInitialItemsList(),ModMenuApiImpl::getItemsList,ModMenuApiImpl::setItemsList)
+                                        .controller(ItemControllerBuilder::create)
+                                        .initial(Items.MACE)
+                                        .build())
+                                .group(ListOption.<Integer>createBuilder()
+                                        .name(Component.translatableWithFallback(Constants.MOD_ID+".config_group",Constants.CONFIG_OPTION_NAME))
+                                        .description(OptionDescription.of(Component.translatableWithFallback(Constants.MOD_ID+".config_group_description",Constants.CONFIG_OPTION_DESCRIPTION)))
+                                        .binding(setInitialMaxsList(),ModMenuApiImpl::getMaxsList, ModMenuApiImpl::setMaxsList)
+                                        .controller(IntegerFieldControllerBuilder::create)
+                                        .initial(3)
+                                        .build())
+                                .build())
+                        .category(ConfigCategory.createBuilder()
+                                .name(Component.translatableWithFallback(Constants.MOD_ID+".name",Constants.MOD_NAME).append(" Experimental"))
                                 .group(ListOption.<MaxCraftableEntry>createBuilder()
                                         .name(Component.translatableWithFallback(Constants.MOD_ID+".config_group",Constants.CONFIG_OPTION_NAME))
                                         .description(OptionDescription.of(Component.translatableWithFallback(Constants.MOD_ID+".config_group_description",Constants.CONFIG_OPTION_DESCRIPTION)))
-                                        .binding(MaxCraftableEntry.toList(YaclState.config),() -> MaxCraftableEntry.toList(YaclState.config), (new_value) -> YaclState.config = MaxCraftableEntry.toMap(new_value))
+//                                        .binding(MaxCraftableEntry.toList(YaclState.config),() -> MaxCraftableEntry.toList(YaclState.config), (new_value) -> YaclState.config = MaxCraftableEntry.toMap(new_value))
+                                        .binding(maxCraftableEntryList,() -> maxCraftableEntryList, (new_value) -> maxCraftableEntryList = new_value)
                                         .controller(MaxCraftableEntryControllerBuilder::create)
                                         .initial(new MaxCraftableEntry(Items.MACE,3))
                                         .build()
                                 )
+                                .group(OptionGroup.createBuilder()
+                                        .name(Component.literal("Send values from experimental screen instead?"))
+                                        .option(Option.<Boolean>createBuilder()
+                                                .name(Component.literal("Send values from experimental screen instead?"))
+                                                .controller(TickBoxControllerBuilder::create)
+                                                .binding(useExperimentalScreen,()->useExperimentalScreen,(n)->useExperimentalScreen=n)
+                                                .build())
+                                        .build())
                                 .build()
+                        )
+                        .save(
+                                () -> {
+                                    if (useExperimentalScreen){
+                                        Services.NETWORKING.sendServerbound(new ServerboundUpdateConfigPacket(MaxCraftableEntry.toMap(maxCraftableEntryList)));
+                                    } else {
+                                        HashMap<Item,Integer> changed = new HashMap<>();
+                                        for (int i = 0; i < items.size(); i++) {
+                                            if (i >= maxs.size()) break;
+                                            changed.put(items.get(i),maxs.get(i));
+                                        }
+                                        for (Item item : YaclState.config.keySet()) {
+                                            // is changed? check
+                                            if (changed.containsKey(item)){
+                                                if (Objects.equals(changed.get(item), YaclState.config.get(item))){
+                                                    changed.remove(item);
+                                                }
+                                            }
+                                            // is removed? check
+                                            else {
+                                                changed.put(item,-1);
+                                            }
+                                        }
+
+                                        Services.NETWORKING.sendServerbound(new ServerboundUpdateConfigPacket(changed));
+                                    }
+                                }
                         )
                         .build().generateScreen(parent);
             }
         });
+    }
+
+    static List<Integer> maxs;
+
+    private static void setMaxsList(@NotNull List<Integer> integers) {
+        maxs = integers;
+    }
+
+    private static @NotNull List<Integer> getMaxsList() {
+        return maxs;
+    }
+
+    private @NotNull List<Integer> setInitialMaxsList() {
+        maxs = YaclState.config.values().stream().toList();
+        return maxs;
+    }
+
+    static List<Item> items;
+
+    private static void setItemsList(@NotNull List<Item> n) {
+        items = n;
+    }
+
+    private static @NotNull List<Item> getItemsList() {
+        return items;
+    }
+
+    private @NotNull List<Item> setInitialItemsList() {
+        items = YaclState.config.keySet().stream().toList();
+        return items;
     }
 }
