@@ -11,10 +11,15 @@ You can set the maximum amount of times an item can be crafted. After it's been 
 - Very easy to understand config.
 - For Fabric, Forge, and NeoForge.
 - No library mods needed.
+- Server owners can now change configuration in game
+- Optional YACL dependency
 
-![crafting a mace](https://cdn.modrinth.com/data/cached_images/049c4c5fb82cd1c84ec1bdc9c4d85b38b40937b4.png)
+### Newest Feature:
+Server owners can now edit which items are restricted in game. Find it by looking for the OnlyCraftOnce configuration screen in the mods menu. The new settings are instantly applied and saved. Also works on singleplayer with cheats on. 
 
 Config documentation: https://github.com/tommyrobot666/only_craft_once/wiki
+
+![crafting a mace](https://cdn.modrinth.com/data/cached_images/049c4c5fb82cd1c84ec1bdc9c4d85b38b40937b4.png)
 
 (Warning: This mod has a [duplication bug](https://github.com/tommyrobot666/only_craft_once/issues/1) that idk how to fix)
 
