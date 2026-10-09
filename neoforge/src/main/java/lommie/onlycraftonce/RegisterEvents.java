@@ -18,29 +18,25 @@ import java.util.function.Consumer;
 public class RegisterEvents {
     @SubscribeEvent
     public static void register(RegisterPayloadHandlersEvent event){
-        final PayloadRegistrar registrar = event.registrar("1");
+        // fix neoforge dedicated server not recognizing clientbound packets (solution credit at: https://forums.minecraftforge.net/topic/89019-1161solved-sending-packets-to-client-from-dedicated-server/ comment: first comment by Novârch)
+        // https://neoforged.net/news/20.4networking-rework/
+        final PayloadRegistrar registrar = event.registrar("1").optional();
         NeoForgeNetworkPacketRegister.deferredServerboundRegistrations.forEach((packet) ->{
             registerPacket(registrar,packet.type(),packet.codec(),packet.handler());
         });
-
-        if (FMLEnvironment.getDist().isClient()) {
-            NeoForgeNetworkPacketRegister.deferredClientboundRegistrations.forEach((packet) -> {
-                registerClientPacket(registrar, packet.type(), packet.codec(), packet.handler());
-            });
-        }
+        NeoForgeNetworkPacketRegister.deferredClientboundRegistrations.forEach((packet) -> {
+            registerClientPacket(registrar, packet.type(), packet.codec());
+        });
     }
 
     private static <T extends CustomPacketPayload, Y extends CustomPacketPayload.Type<T>, U extends StreamCodec<? super RegistryFriendlyByteBuf, T>> void registerPacket(PayloadRegistrar registrar, CustomPacketPayload.Type<? extends CustomPacketPayload> type, StreamCodec<RegistryFriendlyByteBuf,? extends CustomPacketPayload> codec, BiConsumer<? extends CustomPacketPayload, ServerPlayer> handler) {
-        registrar.playToServer(((Y) (Object) type), ((U) (Object) codec),
+        registrar.playToServer(((Y) type), ((U) codec),
                 (p,c) -> {
-                    ((BiConsumer<T,ServerPlayer>) (Object) handler).accept((T) p,((ServerPlayer) c.player()));
+                    ((BiConsumer<T,ServerPlayer>) handler).accept((T) p,((ServerPlayer) c.player()));
                 });
     }
 
-    private static <T extends CustomPacketPayload, Y extends CustomPacketPayload.Type<T>, U extends StreamCodec<? super RegistryFriendlyByteBuf, T>> void registerClientPacket(PayloadRegistrar registrar, CustomPacketPayload.Type<? extends CustomPacketPayload> type, StreamCodec<RegistryFriendlyByteBuf,? extends CustomPacketPayload> codec, Consumer<? extends CustomPacketPayload> handler) {
-        registrar.playToClient(((Y) (Object) type), ((U) (Object) codec),
-                (p,c) -> {
-                    ((Consumer<T>) (Object) handler).accept((T) p);
-                });
+    private static <T extends CustomPacketPayload, Y extends CustomPacketPayload.Type<T>, U extends StreamCodec<? super RegistryFriendlyByteBuf, T>> void registerClientPacket(PayloadRegistrar registrar, CustomPacketPayload.Type<? extends CustomPacketPayload> type, StreamCodec<RegistryFriendlyByteBuf,? extends CustomPacketPayload> codec) {
+        registrar.playToClient(((Y) type), ((U) codec));
     }
 }

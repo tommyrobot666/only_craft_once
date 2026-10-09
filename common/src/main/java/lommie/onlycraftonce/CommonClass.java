@@ -14,6 +14,7 @@ public class CommonClass {
 
         if (Services.PLATFORM.isModLoaded(Constants.YACL_MODID)){
             ModPackets.registerServer();
+            ModPackets.registerClient();
         }
     }
 
