@@ -21,7 +21,7 @@ public class Config {
             (b,map) -> {
                 b.writeInt(map.size());
                 map.forEach((item,max) -> {
-                    b.writeUtf(BuiltInRegistries.ITEM.getKey(item).toString());
+                    b.writeInt(BuiltInRegistries.ITEM.getId(item));
                     b.writeInt(max);
                 });
             },
@@ -30,7 +30,7 @@ public class Config {
                 int i = b.readInt();
 
                 for (; i > 0; i--) {
-                    map.put(BuiltInRegistries.ITEM.getOptional(Identifier.parse(b.readUtf())).orElseThrow(),
+                    map.put(BuiltInRegistries.ITEM.byId(b.readInt()),
                             b.readInt());
                 }
 
