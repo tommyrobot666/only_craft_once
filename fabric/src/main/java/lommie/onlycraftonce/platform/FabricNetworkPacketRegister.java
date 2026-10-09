@@ -21,7 +21,6 @@ public class FabricNetworkPacketRegister implements INetworkPacketRegister {
         ServerPlayNetworking.registerGlobalReceiver(type, (p,c) -> handler.accept(p,c.player()));
     }
 
-    @Environment(EnvType.CLIENT)
     @Override
     public <P extends CustomPacketPayload> void registerClientbound(CustomPacketPayload.Type<P> type, StreamCodec<RegistryFriendlyByteBuf, P> codec, Consumer<P> handler) {
         PayloadTypeRegistry.clientboundPlay().register(type,codec);
