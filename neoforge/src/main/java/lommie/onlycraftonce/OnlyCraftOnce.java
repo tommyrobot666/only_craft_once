@@ -1,6 +1,7 @@
 package lommie.onlycraftonce;
 
 
+import lommie.onlycraftonce.yacl.YACLScreen;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
@@ -18,7 +19,7 @@ public class OnlyCraftOnce {
 
         ModLoadingContext.get().registerExtensionPoint(
                 IConfigScreenFactory.class,
-                () -> YACLScreen::generateScreen
+                () -> (m,s) -> YACLScreen.generateScreen(s)
         );
     }
 }

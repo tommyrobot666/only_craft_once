@@ -20,7 +20,7 @@ public class Constants {
     public static final String CONFIG_ERROR_TIMEOUT = "Receiving the server's config took too long. Check chat for an \"You don't have permission...\" error. If you don't see any error, then close this screen and wait a bit before reopening";
     public static final String CONFIG_OPTION_ITEM_LIST_DESCRIPTION = "The list of restricted items, corresponds with max amounts in next list";
     public static final String CONFIG_OPTION_ITEM_NAME = "Items";
-    public static final String TRY_AGAIN_ERROR = "Try again, LOL";
+    public static final String TRY_AGAIN_ERROR = "Try again, LOL (if you're not op, check chat)";
 
     public static final int GET_CONFIG_TRYS = 1;
     public static final int GET_CONFIG_WAIT = 1;
