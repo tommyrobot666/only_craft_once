@@ -12,25 +12,30 @@
         "sources": "https://github.com/FabricMC/fabric-example-mod"
     },
     "license": "${license}",
-    "icon": "${mod_id}.png",
+    "icon": "i5square.png",
     "environment": "*",
     "entrypoints": {
         "main": [
             "lommie.onlycraftonce.OnlyCraftOnce"
-        ]
+        ],
+        "client": [
+            "lommie.onlycraftonce.client.OnlyCraftOnceClient"
+        ],
+        "modmenu": [ "lommie.onlycraftonce.ModMenuApiImpl" ]
     },
     "mixins": [
         "${mod_id}.mixins.json",
         "${mod_id}.fabric.mixins.json"
     ],
     "depends": {
-        "fabricloader": ">=${fabric_loader_version}",
+        "fabricloader": ">=${fabric_loader_version_range}",
         "fabric-api": "*",
-        "minecraft": "~${minecraft_version}",
+        "minecraft": "${fabric_minecraft_version_range}",
         "java": ">=${java_version}"
     },
     "suggests": {
-        "another-mod": "*"
+        "yet_another_config_lib_v3": "*",
+        "modmenu": "*"
     }
 }
   

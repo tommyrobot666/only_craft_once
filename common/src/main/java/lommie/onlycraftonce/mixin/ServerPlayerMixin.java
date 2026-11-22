@@ -1,11 +1,11 @@
 package lommie.onlycraftonce.mixin;
 
+import lommie.onlycraftonce.Constants;
 import lommie.onlycraftonce.saveddata.TimesCraftedSavedData;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stat;
+import net.minecraft.stats.Stats;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -14,17 +14,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerPlayer.class)
 public abstract class ServerPlayerMixin {
-
-    @Shadow public abstract ServerLevel serverLevel();
+    @Shadow public abstract ServerLevel level();
 
     @Inject(method = "awardStat", at = @At("HEAD"))
     void addTimesCrafted(Stat<?> stat, int amount, CallbackInfo ci){
-        if (stat.getType().equals(
-                BuiltInRegistries.STAT_TYPE.get(
-                        ResourceLocation.withDefaultNamespace("crafted"))
-        )){
-            TimesCraftedSavedData savedData = TimesCraftedSavedData.getFromLevel(this.serverLevel());
+        if (stat.getType().equals(Stats.ITEM_CRAFTED)){
+            TimesCraftedSavedData savedData = TimesCraftedSavedData.get(this.level());
             String id = stat.getName();
+            if (id.endsWith("minecraft.air")){
+                Constants.LOG.error("mixin of awardStat found air as crafted item (issue #3)");
+            }
             savedData.map.put(id,savedData.map.getOrDefault(id,0)+amount);
             savedData.setDirty();
         }
