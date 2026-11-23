@@ -48,6 +48,6 @@ plugins {
 rootProject.name = 'only_craft_once'
 includeBuild('build-logic')
 include('common')
-include('fabric')
-include('neoforge')
-//include('forge')
+//include('fabric')
+//include('neoforge')
+include('forge')
