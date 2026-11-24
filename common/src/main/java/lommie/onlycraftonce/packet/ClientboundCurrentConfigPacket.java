@@ -7,21 +7,21 @@ import lommie.onlycraftonce.yacl.YaclState;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 
 public record ClientboundCurrentConfigPacket(HashMap<Item,Integer> config) implements CustomPacketPayload {
-    public static final Type<ClientboundCurrentConfigPacket> TYPE = new Type<>(Identifier.fromNamespaceAndPath(Constants.MOD_ID,"current_config"));
+    public static final Type<ClientboundCurrentConfigPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID,"current_config"));
     public static final StreamCodec<RegistryFriendlyByteBuf,ClientboundCurrentConfigPacket> CODEC = StreamCodec.composite(
             Config.CONFIG_STREAM_CODEC,
             ClientboundCurrentConfigPacket::config,
             ClientboundCurrentConfigPacket::new);
 
     @Override
-    public @NonNull Type<? extends CustomPacketPayload> type() {
+    public @NotNull Type<? extends CustomPacketPayload> type() {
         return TYPE;
     }
 

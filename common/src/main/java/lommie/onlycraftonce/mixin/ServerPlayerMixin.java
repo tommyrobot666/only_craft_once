@@ -14,12 +14,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerPlayer.class)
 public abstract class ServerPlayerMixin {
-    @Shadow public abstract ServerLevel level();
+    @Shadow public abstract ServerLevel serverLevel();
 
     @Inject(method = "awardStat", at = @At("HEAD"))
     void addTimesCrafted(Stat<?> stat, int amount, CallbackInfo ci){
         if (stat.getType().equals(Stats.ITEM_CRAFTED)){
-            TimesCraftedSavedData savedData = TimesCraftedSavedData.get(this.level());
+            TimesCraftedSavedData savedData = TimesCraftedSavedData.get(this.serverLevel());
             String id = stat.getName();
             if (id.endsWith("minecraft.air")){
                 Constants.LOG.error("mixin of awardStat found air as crafted item (issue #3)");

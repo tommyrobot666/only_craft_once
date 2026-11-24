@@ -7,15 +7,12 @@ import dev.isxander.yacl3.gui.controllers.ControllerWidget;
 import dev.isxander.yacl3.gui.utils.GuiUtils;
 import dev.isxander.yacl3.gui.utils.ItemRegistryHelper;
 import dev.isxander.yacl3.gui.utils.UndoRedoHelper;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.input.CharacterEvent;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import org.jspecify.annotations.NonNull;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -51,9 +48,9 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
     }
 
     @Override
-    protected void extractValueText(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
-        itemInputField.extractValueText(graphics,mouseX,mouseY,a,this);
-        maxInputField.extractValueText(graphics,mouseX,mouseY,a,this);
+    protected void drawValueText(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        itemInputField.extractValueText(graphics,mouseX,mouseY,delta,this);
+        maxInputField.extractValueText(graphics,mouseX,mouseY,delta,this);
         if (currentItem != null) {
             extractFakeItem(
                     graphics,
@@ -67,7 +64,7 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
 
 
     //from ItemControllerElement
-    private void extractFakeItem(GuiGraphicsExtractor graphics, Item item, int x, int y) {
+    private void extractFakeItem(GuiGraphics graphics, Item item, int x, int y) {
         ItemStack stack = null;
         try {
             stack = new ItemStack(item);
@@ -77,7 +74,7 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
             // This means we cannot do anything that involves ItemStacks until then.
         }
         if (stack == null) return;
-        graphics.fakeItem(stack, x, y);
+        graphics.renderFakeItem(stack, x, y);
     }
     void updateCurrentItem() {
         currentItem = ItemRegistryHelper.getItemFromName(itemInputField.inputField, currentItem);
@@ -92,9 +89,9 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
     }
 
     @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        boolean b1 = itemInputField.mouseClicked(event,doubleClick,this);
-        boolean b2 = maxInputField.mouseClicked(event,doubleClick,this);
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        boolean b1 = itemInputField.mouseClicked(mouseX,mouseY,button,this);
+        boolean b2 = maxInputField.mouseClicked(mouseX,mouseY,button,this);
         if (!(b1 || b2)){
             itemInputField.inputFieldFocused = false;
             maxInputField.inputFieldFocused = false;
@@ -105,16 +102,16 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
     }
 
     @Override
-    public boolean keyPressed(KeyEvent event) {
-        boolean b1 = itemInputField.keyPressed(event,this);
-        boolean b2 = maxInputField.keyPressed(event,this);
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        boolean b1 = itemInputField.keyPressed(keyCode,scanCode,modifiers,this);
+        boolean b2 = maxInputField.keyPressed(keyCode,scanCode,modifiers,this);
         return b1 || b2;
     }
 
     @Override
-    public boolean charTyped(CharacterEvent event) {
-        boolean b1 = itemInputField.charTyped(event);
-        boolean b2 = maxInputField.charTyped(event);
+    public boolean charTyped(char codePoint, int modifiers) {
+        boolean b1 = itemInputField.charTyped(codePoint,modifiers);
+        boolean b2 = maxInputField.charTyped(codePoint,modifiers);
         return b1 || b2;
     }
 
@@ -162,7 +159,7 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
         private final Component emptyText = Component.literal("emptyyy");
         private Runnable inputFieldFocusedEvent;
 
-        protected void extractValueText (GuiGraphicsExtractor graphics,int mouseX, int mouseY, float a, ControllerWidget w){
+        protected void extractValueText (GuiGraphics graphics,int mouseX, int mouseY, float a, ControllerWidget w){
 //            Component valueText = getCurrentValue.get();
             Component valueText = getValue.get();
             if (valueText.getString().isEmpty()) valueText = emptyText;
@@ -172,7 +169,7 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
 
             int textX = getDimension().xLimit() - textRenderer.width(valueText) + renderOffset - getXPadding();
             graphics.enableScissor(inputFieldBounds.x(), inputFieldBounds.y() - 2, inputFieldBounds.xLimit() + 1, inputFieldBounds.yLimit() + 4);
-            graphics.text(textRenderer, valueText, textX, getTextY(), getValueColor(), true);
+            graphics.drawString(textRenderer, valueText, textX, getTextY(), getValueColor(), true);
 
             if (isHovered(w)) {
                 ticks += a;
@@ -206,27 +203,21 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
             }
             graphics.disableScissor();
 
-            if (this.isHoveredInputField(mouseX, mouseY)) {
-                graphics.requestCursor(isAvailable() ? com.mojang.blaze3d.platform.cursor.CursorTypes.IBEAM : com.mojang.blaze3d.platform.cursor.CursorTypes.NOT_ALLOWED);
-            } else if (w.isHovered()) {
-                graphics.requestCursor(isAvailable() ? com.mojang.blaze3d.platform.cursor.CursorTypes.POINTING_HAND : com.mojang.blaze3d.platform.cursor.CursorTypes.NOT_ALLOWED);
-            }
         }
 
         private boolean isHoveredInputField ( double mouseX, double mouseY){
             return inputFieldBounds.isPointInside((int) mouseX, (int) mouseY);
         }
 
-        public boolean mouseClicked (@NonNull MouseButtonEvent event,boolean doubleClick,ControllerWidget w){
-            if (isAvailable() && getDimension().isPointInside((int) event.x(), (int) event.y())) {
-                setInputFieldFocused(true);
-                updateTextInputFocus(true,w);
+        public boolean mouseClicked(double mouseX, double mouseY, int button, ControllerWidget w) {
+            if (isAvailable() && getDimension().isPointInside((int) mouseX, (int) mouseY)) {
+                inputFieldFocused = true;
 
-                if (!isHoveredInputField(event.x(), event.y())) {
+                if (!inputFieldBounds.isPointInside((int) mouseX, (int) mouseY)) {
                     caretPos = getDefaultCaretPos();
                 } else {
                     // gets the appropriate caret position for where you click
-                    int textX = (int) event.x() - (inputFieldBounds.xLimit() - textRenderer.width(getValue.get()));
+                    int textX = (int) mouseX - (inputFieldBounds.xLimit() - textRenderer.width(getValueText()));
                     int pos = -1;
                     int currentWidth = 0;
                     for (char ch : inputField.toCharArray()) {
@@ -244,9 +235,9 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
 
                     selectionLength = 0;
                 }
-    //            if (undoRedoHelper == null) {
-    //                undoRedoHelper = new UndoRedoHelper(inputField, caretPos, selectionLength);
-    //            }
+//            if (undoRedoHelper == null) {
+//                undoRedoHelper = new UndoRedoHelper(inputField, caretPos, selectionLength);
+//            }
 
                 return true;
             } else {
@@ -265,18 +256,18 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
             return inputField.length();
         }
 
-        public boolean keyPressed (@NonNull KeyEvent event,ControllerWidget w){
+        public boolean keyPressed(int keyCode, int scanCode, int modifiers, ControllerWidget w) {
             if (!inputFieldFocused)
                 return false;
 
-            switch (event.key()) {
+            switch (keyCode) {
                 case InputConstants.KEY_ESCAPE, InputConstants.KEY_RETURN -> {
                     unfocus(w);
                     return true;
                 }
                 case InputConstants.KEY_LEFT -> {
-                    if (event.hasShiftDown()) {
-                        if (event.hasControlDown()) {
+                    if (Screen.hasShiftDown()) {
+                        if (Screen.hasControlDown()) {
                             int spaceChar = findSpaceIndex(true);
                             selectionLength += caretPos - spaceChar;
                             caretPos = spaceChar;
@@ -287,7 +278,7 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
                         checkRenderOffset();
                     } else {
                         if (caretPos > 0) {
-                            if (event.hasControlDown()) {
+                            if (Screen.hasControlDown()) {
                                 caretPos = findSpaceIndex(true);
                             } else {
                                 if (selectionLength != 0) {
@@ -302,8 +293,8 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
                     return true;
                 }
                 case InputConstants.KEY_RIGHT -> {
-                    if (event.hasShiftDown()) {
-                        if (event.hasControlDown()) {
+                    if (Screen.hasShiftDown()) {
+                        if (Screen.hasControlDown()) {
                             int spaceChar = findSpaceIndex(false);
                             selectionLength -= spaceChar - caretPos;
                             caretPos = spaceChar;
@@ -314,7 +305,7 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
                         checkRenderOffset();
                     } else {
                         if (caretPos < inputField.length()) {
-                            if (event.hasControlDown()) {
+                            if (Screen.hasControlDown()) {
                                 caretPos = findSpaceIndex(false);
                             } else {
                                 if (selectionLength != 0) {
@@ -337,7 +328,7 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
                     return true;
                 }
                 case InputConstants.KEY_END -> {
-                    if (event.hasShiftDown()) {
+                    if (Screen.hasShiftDown()) {
                         selectionLength -= inputField.length() - caretPos;
                     } else selectionLength = 0;
                     caretPos = inputField.length();
@@ -345,7 +336,7 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
                     return true;
                 }
                 case InputConstants.KEY_HOME -> {
-                    if (event.hasShiftDown()) {
+                    if (Screen.hasShiftDown()) {
                         selectionLength += caretPos;
                         caretPos = 0;
                     } else {
@@ -355,29 +346,29 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
                     checkRenderOffset();
                     return true;
                 }
-    //            case InputConstants.KEY_Z -> {
-    //                if (Screen.hasControlDown()) {
-    //                    UndoRedoHelper.FieldState updated = Screen.hasShiftDown() ? undoRedoHelper.redo() : undoRedoHelper.undo();
-    //                    if (updated != null) {
-    //                        System.out.println("Updated: " + updated);
-    //                        if (modifyInput(builder -> builder.replace(0, inputField.length(), updated.text()))) {
-    //                            caretPos = updated.cursorPos();
-    //                            selectionLength = updated.selectionLength();
-    //                            checkRenderOffset();
-    //                        }
-    //                    }
-    //                    return true;
-    //                }
-    //            }
+//            case InputConstants.KEY_Z -> {
+//                if (Screen.hasControlDown()) {
+//                    UndoRedoHelper.FieldState updated = Screen.hasShiftDown() ? undoRedoHelper.redo() : undoRedoHelper.undo();
+//                    if (updated != null) {
+//                        System.out.println("Updated: " + updated);
+//                        if (modifyInput(builder -> builder.replace(0, inputField.length(), updated.text()))) {
+//                            caretPos = updated.cursorPos();
+//                            selectionLength = updated.selectionLength();
+//                            checkRenderOffset();
+//                        }
+//                    }
+//                    return true;
+//                }
+//            }
             }
 
-            if (event.isPaste()) {
+            if (Screen.isPaste(keyCode)) {
                 return doPaste();
-            } else if (event.isCopy()) {
+            } else if (Screen.isCopy(keyCode)) {
                 return doCopy();
-            } else if (event.isCut()) {
+            } else if (Screen.isCut(keyCode)) {
                 return doCut();
-            } else if (event.isSelectAll()) {
+            } else if (Screen.isSelectAll(keyCode)) {
                 return doSelectAll();
             }
 
@@ -434,13 +425,17 @@ public class MaxCraftableEntryControllerElement extends ControllerWidget<MaxCraf
             }
         }
 
-            public boolean charTyped (@NonNull CharacterEvent event){
+        public boolean charTyped(char chr, int modifiers) {
             if (!inputFieldFocused)
                 return false;
 
-            write(event.codepointAsString());
-            updateUndoHistory();
-            return true;
+            if (!Screen.hasControlDown()) {
+                write(Character.toString(chr));
+                updateUndoHistory();
+                return true;
+            }
+
+            return false;
         }
 
         protected void doBackspace () {

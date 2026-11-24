@@ -6,7 +6,7 @@ import lommie.onlycraftonce.platform.Services;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 
@@ -147,7 +147,7 @@ public class Config {
 
         maxTimesCrafted.clear();
         loadingConfig.forEach((sId,max) -> {
-            Optional<Item> item = BuiltInRegistries.ITEM.getOptional(Identifier.parse(sId));
+            Optional<Item> item = BuiltInRegistries.ITEM.getOptional(ResourceLocation.parse(sId));
             if (item.isEmpty()){
                 Constants.LOG.error("Id {} was not found in registry",sId);
             } else {

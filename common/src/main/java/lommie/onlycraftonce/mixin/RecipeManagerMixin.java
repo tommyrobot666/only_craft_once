@@ -1,18 +1,16 @@
 package lommie.onlycraftonce.mixin;
 
-import lommie.onlycraftonce.CommonClass;
 import lommie.onlycraftonce.Config;
 import lommie.onlycraftonce.saveddata.TimesCraftedSavedData;
-import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -29,7 +27,7 @@ public abstract class RecipeManagerMixin {
     void checkIfCraftedBefore(RecipeType<T> recipeType, I input, Level level, CallbackInfoReturnable<Optional<RecipeHolder<T>>> cir){
         if (cir.getReturnValue().isEmpty()) return;
         var recipeHolder = cir.getReturnValue().get();
-        ItemStack result = recipeHolder.value().assemble(input);
+        ItemStack result = recipeHolder.value().assemble(input,level.registryAccess());
         Item item = result.getItem();
         TimesCraftedSavedData savedData = TimesCraftedSavedData.get(((ServerLevel) level));
         //TODO I should change this to just item.toString(), but that would break compatibility with v1.0
@@ -41,11 +39,11 @@ public abstract class RecipeManagerMixin {
     }
 
     @Inject(
-            method = "getRecipeFor(Lnet/minecraft/world/item/crafting/RecipeType;Lnet/minecraft/world/item/crafting/RecipeInput;Lnet/minecraft/world/level/Level;Lnet/minecraft/resources/ResourceKey;)Ljava/util/Optional;",
+            method = "Lnet/minecraft/world/item/crafting/RecipeManager;getRecipeFor(Lnet/minecraft/world/item/crafting/RecipeType;Lnet/minecraft/world/item/crafting/RecipeInput;Lnet/minecraft/world/level/Level;Lnet/minecraft/resources/ResourceLocation;)Ljava/util/Optional;",
             at = @At("RETURN"),
             cancellable = true)
     <I extends RecipeInput, T extends Recipe<@NotNull I>>
-    void checkIfCraftedBefore2(RecipeType<T> recipeType, I input, Level level, @Nullable ResourceKey<Recipe<?>> recipe, CallbackInfoReturnable<Optional<RecipeHolder<T>>> cir){
+    void checkIfCraftedBefore2(RecipeType<T> recipeType, I input, Level level, ResourceLocation lastRecipe, CallbackInfoReturnable<Optional<RecipeHolder<T>>> cir){
         checkIfCraftedBefore(recipeType,input,level,cir);
     }
 
