@@ -7,8 +7,8 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.handling.IPayloadHandler;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 import java.util.function.BiConsumer;
@@ -25,7 +25,7 @@ public class RegisterEvents {
             registerPacket(registrar,packet.type(),packet.codec(),packet.handler());
         });
         NeoForgeNetworkPacketRegister.deferredClientboundRegistrations.forEach((packet) -> {
-            registerClientPacket(registrar, packet.type(), packet.codec());
+            registerClientPacket(registrar, packet.type(), packet.codec(), packet.handler());
         });
     }
 
@@ -36,7 +36,9 @@ public class RegisterEvents {
                 });
     }
 
-    private static <T extends CustomPacketPayload, Y extends CustomPacketPayload.Type<T>, U extends StreamCodec<? super RegistryFriendlyByteBuf, T>> void registerClientPacket(PayloadRegistrar registrar, CustomPacketPayload.Type<? extends CustomPacketPayload> type, StreamCodec<RegistryFriendlyByteBuf,? extends CustomPacketPayload> codec) {
-        registrar.playToClient(((Y) type), ((U) codec));
+    private static <T extends CustomPacketPayload, Y extends CustomPacketPayload.Type<T>, U extends StreamCodec<? super RegistryFriendlyByteBuf, T>> void registerClientPacket(PayloadRegistrar registrar, CustomPacketPayload.Type<? extends CustomPacketPayload> type, StreamCodec<RegistryFriendlyByteBuf,? extends CustomPacketPayload> codec, Consumer<T> handler) {
+        registrar.playToClient(((Y) type), ((U) codec), (p,c) -> {
+            handler.accept(p);
+        });
     }
 }

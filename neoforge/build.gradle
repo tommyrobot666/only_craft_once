@@ -41,4 +41,21 @@ neoForge {
     }
 }
 
+repositories {
+    maven {
+        name 'Xander Maven'
+        url 'https://maven.isxander.dev/releases'
+    }
+    maven {
+        name = 'Kotlin for Forge'
+        url = 'https://thedarkcolour.github.io/KotlinForForge/'
+    }
+}
+
+dependencies {
+    implementation("dev.isxander:yet-another-config-lib:${project.neo_yacl_version}") {
+        transitive = false
+    }
+}
+
 sourceSets.main.resources { srcDir 'src/generated/resources' }

@@ -17,13 +17,13 @@ import java.util.function.Consumer;
 public class FabricNetworkPacketRegister implements INetworkPacketRegister {
     @Override
     public <P extends CustomPacketPayload> void registerServerbound(CustomPacketPayload.Type<P> type, StreamCodec<RegistryFriendlyByteBuf, P> codec, BiConsumer<P, ServerPlayer> handler) {
-        PayloadTypeRegistry.serverboundPlay().register(type,codec);
+        PayloadTypeRegistry.playC2S().register(type,codec);
         ServerPlayNetworking.registerGlobalReceiver(type, (p,c) -> handler.accept(p,c.player()));
     }
 
     @Override
     public <P extends CustomPacketPayload> void registerClientbound(CustomPacketPayload.Type<P> type, StreamCodec<RegistryFriendlyByteBuf, P> codec, Consumer<P> handler) {
-        PayloadTypeRegistry.clientboundPlay().register(type,codec);
+        PayloadTypeRegistry.playS2C().register(type,codec);
         ClientPlayNetworking.registerGlobalReceiver(type, (p,c) -> handler.accept(p));
     }
 

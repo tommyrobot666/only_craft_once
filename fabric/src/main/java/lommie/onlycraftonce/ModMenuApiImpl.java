@@ -1,5 +1,6 @@
 package lommie.onlycraftonce;
 
+// TODO figure out why config button does nothing
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
 import lommie.onlycraftonce.platform.Services;
