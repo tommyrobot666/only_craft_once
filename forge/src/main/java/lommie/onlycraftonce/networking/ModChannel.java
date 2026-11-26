@@ -8,9 +8,9 @@ import net.minecraftforge.network.SimpleChannel;
 
 public class ModChannel {
     public static final SimpleChannel CLIENTBOUND = ChannelBuilder
-            .named(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID,"channel"))
+            .named(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID,"clientbound"))
             .optional().simpleChannel().play().clientbound().build();
     public static final SimpleChannel SERVERBOUND = ChannelBuilder
-            .named(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID,"channel"))
+            .named(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID,"serverbound"))
             .optional().simpleChannel().play().serverbound().build();
 }
