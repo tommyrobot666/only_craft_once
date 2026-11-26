@@ -1,6 +1,5 @@
 package lommie.onlycraftonce.platform.services;
 
-import lommie.onlycraftonce.packet.ClientboundCurrentConfigPacket;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -10,8 +9,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public interface INetworkPacketRegister {
-    <P extends CustomPacketPayload> void registerServerbound(CustomPacketPayload.Type<P> type, StreamCodec<RegistryFriendlyByteBuf,P> codec, BiConsumer<P, ServerPlayer> handler);
-    <P extends CustomPacketPayload> void registerClientbound(CustomPacketPayload.Type<P> type, StreamCodec<RegistryFriendlyByteBuf,P> codec, Consumer<P> handler);
+    <P extends CustomPacketPayload> void registerServerbound(CustomPacketPayload.Type<P> type, StreamCodec<RegistryFriendlyByteBuf,P> codec, BiConsumer<P, ServerPlayer> handler, Class<P> pClass);
+    <P extends CustomPacketPayload> void registerClientbound(CustomPacketPayload.Type<P> type, StreamCodec<RegistryFriendlyByteBuf,P> codec, Consumer<P> handler, Class<P> pClass);
 
     void sendClientbound(CustomPacketPayload packetPayload, ServerPlayer player);
     void sendServerbound(CustomPacketPayload packetPayload);

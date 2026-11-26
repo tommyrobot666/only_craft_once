@@ -1,8 +1,6 @@
 package lommie.onlycraftonce.platform;
 
 import lommie.onlycraftonce.platform.services.INetworkPacketRegister;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -16,13 +14,13 @@ import java.util.function.Consumer;
 
 public class FabricNetworkPacketRegister implements INetworkPacketRegister {
     @Override
-    public <P extends CustomPacketPayload> void registerServerbound(CustomPacketPayload.Type<P> type, StreamCodec<RegistryFriendlyByteBuf, P> codec, BiConsumer<P, ServerPlayer> handler) {
+    public <P extends CustomPacketPayload> void registerServerbound(CustomPacketPayload.Type<P> type, StreamCodec<RegistryFriendlyByteBuf, P> codec, BiConsumer<P, ServerPlayer> handler, Class<P> pClass) {
         PayloadTypeRegistry.playC2S().register(type,codec);
         ServerPlayNetworking.registerGlobalReceiver(type, (p,c) -> handler.accept(p,c.player()));
     }
 
     @Override
-    public <P extends CustomPacketPayload> void registerClientbound(CustomPacketPayload.Type<P> type, StreamCodec<RegistryFriendlyByteBuf, P> codec, Consumer<P> handler) {
+    public <P extends CustomPacketPayload> void registerClientbound(CustomPacketPayload.Type<P> type, StreamCodec<RegistryFriendlyByteBuf, P> codec, Consumer<P> handler, Class<P> pClass) {
         PayloadTypeRegistry.playS2C().register(type,codec);
         ClientPlayNetworking.registerGlobalReceiver(type, (p,c) -> handler.accept(p));
     }
