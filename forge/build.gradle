@@ -87,11 +87,6 @@ dependencies {
 
     // Forge's hack fix
     implementation('net.sf.jopt-simple:jopt-simple:5.0.4') { version { strictly '5.0.4' } }
-    implementation("dev.isxander:yet-another-config-lib:${project.neo_yacl_version}") {
-//        exclude group: "thedarkcolour"
-//        exclude group: "com.twelvemonkeys.imageio", module: "imageio-webp"
-        transitive = false
-    }
 }
 
 publishing {

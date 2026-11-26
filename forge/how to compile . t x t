@@ -1,0 +1,2 @@
+Delete everything in commmon-yacl except for YaclState
+after build and test, undo delete with rollback
