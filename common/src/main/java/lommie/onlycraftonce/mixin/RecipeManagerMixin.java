@@ -26,6 +26,7 @@ public abstract class RecipeManagerMixin {
     <I extends RecipeInput, T extends Recipe<@NotNull I>>
     void checkIfCraftedBefore(RecipeType<T> recipeType, I input, Level level, CallbackInfoReturnable<Optional<RecipeHolder<T>>> cir){
         if (cir.getReturnValue().isEmpty()) return;
+        if (level.isClientSide()) return;
         var recipeHolder = cir.getReturnValue().get();
         ItemStack result = recipeHolder.value().assemble(input,level.registryAccess());
         Item item = result.getItem();
