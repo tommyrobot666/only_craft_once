@@ -48,4 +48,9 @@ loom {
             runDir('runs/server')
         }
     }
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
+        }
+    }
 }
